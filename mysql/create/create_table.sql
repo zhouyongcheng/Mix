@@ -6,5 +6,8 @@ create table t_name engine=myisam as select * from other_table;
 create table t_name engine=archive as select * from other_table;
 create table t_name (age int, c char(10)) engine=blackhole;
 
+create table t_name (age int, address char(10)) engine=myisam;
+show table status like 't_name'\G;
+
 
 

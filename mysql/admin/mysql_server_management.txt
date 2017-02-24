@@ -164,7 +164,8 @@ set character set utf8;
 create database demodb character set utf8;
 数据库级别的字符集设定，是放在了每个数据库目录下的db.opt下面。
 
-
+# 显示master的状态
+show master status
 
 
 
