@@ -86,6 +86,19 @@ D:\mysql-5.7.17\uploads
 4)创建初始数据库
 mysqld --defaults-file=d:\mysql-5.7.17\my.ini --initialize-insecure --console
 
+
+* 默认配置文件的路径 (echo %WINDIR%)
+1)%WINDIR%\my.ini
+2)c:\my.ini
+3)install_dir\my.ini
+
+* linux的默认查找优先级
+/etc/my.cnf
+/etc/mysql/my.cnf
+$MYSQL_HOME/my.cnf
+
+
+
 5）添加或删除既存的windows服务
 mysqld --install mysql --defaults-file=d:\mysql\my.ini
 mysqld --remove mysql

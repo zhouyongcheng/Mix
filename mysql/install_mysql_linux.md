@@ -9,7 +9,7 @@
 
 
 ```
-groupadd mysql
+groupadd mysqls
 useradd -r -g mysql -s /bin/false mysql
 cd /data01/
 tar zxvf mysql-version.tar.gz
