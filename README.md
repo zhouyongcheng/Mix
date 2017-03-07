@@ -15,3 +15,6 @@ git config --global user.email "register@mail"
 
 #https://git store password avoid input every time
 git config --global credential.helper store
+
+
+http://angular-tips.com/blog/archives/

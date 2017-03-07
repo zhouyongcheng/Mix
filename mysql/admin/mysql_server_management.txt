@@ -167,7 +167,11 @@ create database demodb character set utf8;
 # 显示master的状态
 show master status
 
+# 清空所有的二进制日志文件
+mysql> reset master
 
+#删除指定的二进制文件
+mysql> purge binary logs 
 
 
 
