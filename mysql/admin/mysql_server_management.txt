@@ -173,6 +173,14 @@ mysql> reset master
 #删除指定的二进制文件
 mysql> purge binary logs 
 
+# 持有对象的只读锁
+mysql> flush tables table_list  with read lock;  
+
+# 释放只读锁
+mysql> unlock tables;
+
+
+
 
 
 

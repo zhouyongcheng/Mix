@@ -18,3 +18,5 @@ git config --global credential.helper store
 
 
 http://angular-tips.com/blog/archives/
+
+http://es6.ruanyifeng.com/#docs/intro
