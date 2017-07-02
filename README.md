@@ -24,3 +24,5 @@ http://es6.ruanyifeng.com/#docs/intro
 https://github.com/gbahamondezc/angular2-quickstart-es6
 
 https://github.com/Farata/angular2typescript
+
+test only
