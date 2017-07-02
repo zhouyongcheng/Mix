@@ -1,4 +1,9 @@
 # 用二进制包安装mysql
+> download mysql
+
+`http://www.baidu.com`
+
+
 > 下面的操作用root账号进行操作。
 
 * linux的默认查找优先级
