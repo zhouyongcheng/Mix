@@ -29,3 +29,5 @@ chown -R root .
 chwon -R  mysql data mysql-files
 bin/mysqld_safe --user=mysql &
 ```
+
+need to test
