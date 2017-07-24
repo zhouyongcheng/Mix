@@ -26,6 +26,7 @@ systemctl status docker.service
 docker images            // 查看本的的镜像列表
 docker inspect image_id  // 查看镜像的详细内容
 docker search mysql      // 查询mysql镜像
+docker search -s 20 ubuntu  // s: star
 docker search redis      // 查询redis镜像
 docker pull redis        // 从远程库下载镜像到本地
 docker rmi  mysql        // 删除本地的mysql镜像
@@ -36,7 +37,7 @@ docker run -it ubuntu /bin/bash  //启动镜像，建立容器
 ## 创建镜像
 ````
 1. 基于容器创建
-   docker commit -m "创建新镜像，基于xx" based_container_id new_image_id
+   docker commit -m "创建新镜像，基于xx容器" based_container new_image_id:[tag]
    
 2. 基于本地模版导入
    
