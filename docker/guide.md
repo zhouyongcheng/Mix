@@ -85,6 +85,7 @@ docker ps -a
 docker rm container_id
 // 进入后台的进程
 docker attach container_name
+docker exec -it container_id /bin/bash
 // 停止运行的容器
 docker stop container_id
 // 导出容器
