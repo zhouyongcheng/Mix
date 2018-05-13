@@ -171,6 +171,20 @@ show engines;
 # 查看表的状态
 show table status like 't_mytable'\G;
 
+#forget password for mysql root user
+* use system root accout do the following directive.
+--------------------------------------------------------
+* /etc/init.d/mysql.server stop
+* cd /data01/mysql/bin
+* ./mysqld_safe --skip-grant-tables &
+* ./mysql -p
+* mysql> update mysql.user set authentication_string=password('manager') where user='root' and host = 'localhost'
+* mysql> flush privileges;
+* mysql> quit;
+* /etc/init.d/mysql.server stop
+* /etc/init.d/mysql.server start
+----------------------------------------------------
+
 
 
 
