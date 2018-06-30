@@ -48,6 +48,9 @@ docker rmi  mysql        // 删除本地的mysql镜像
 docker rmi image_id      // 删除指定ID的镜像
 docker rmi -f image_id   // 强制删除指定的镜像
 docker run -it ubuntu /bin/bash  //启动镜像，建立容器
+docker ps 
+docker ps -a              // list all docker container
+docker port container_id  // confirm docker running port information
 ````
 ## 创建镜像
 ````
@@ -147,5 +150,9 @@ docker port container_nm
 docker run -d --name db mydb-image
 docker run -td --link db:db --name myweb spring-boot-img 
 ````
+
+
+docker run --name db --env MYSQL_ROOT_PASSWORD=example -d mariadb
+docker run --name MyWordPress --link db:mysql -p 8080:80 -d wordpress
 
  
