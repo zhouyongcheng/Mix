@@ -1,3 +1,5 @@
+## use root account do all the following things.
+
 # 安装zookeeper
 [Zookeeper下载](http://zookeeper.apache.org/releases.html)
 * 用户[安装/运行][root/root]
@@ -24,14 +26,36 @@ server.2=zoo2:2888:3888
 server.3=zoo3:2888:3888
 ````
 * 启动zookeeper  
-``bin/zkServer.sh start``
+```
+bin/zkServer.sh start
+bin/zkServer.sh stop
+```  
 
 * 启动客户端
-``bin/zkCli.sh``
+```
+bin/zkCli.sh
+zkCli.sh -server ip:port
+```
 
 
 ## 应维
+## create zookeeper node
+create [-s] [-e] path data acl    s->sequential node | e->temp node
+----------------------------------------
+example:
+create /zk-book 123               path=/zk-book    data=123
 
+ls path 
+example:
+ls /zk-book
+
+get path
+get /zk-book
+
+set path data
+set /zk-book 456
+
+delete path [version]
 
 
 

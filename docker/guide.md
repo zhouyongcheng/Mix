@@ -7,7 +7,7 @@
 ## EurekaConsumer: 9002
 
 
-## docker的安装
+## docker的安装(centos)
 ````
 yum -y update
 wget -qO- https://get.docker.com/ | sh
@@ -21,7 +21,22 @@ systemctl start docker.service
 systemctl status docker.service
 ````
 
-## docker的镜像管理
+## get mirror
+````
+docker pull registry.hub.docker.com/ubuntu:latest
+docker pull dl.dockerpool.com:5000/ubuntu
+docker pull ubuntu
+docker pull ubuntu:latest
+docker pull ubuntu:14.04
+````
+
+## use image to create container
+```
+docker run -t -i ubuntu /bin/bash
+```
+
+
+## docker的镜像管理(must use root to do management)
 ````
 docker images            // 查看本的的镜像列表
 docker inspect image_id  // 查看镜像的详细内容
@@ -38,6 +53,14 @@ docker run -it ubuntu /bin/bash  //启动镜像，建立容器
 ````
 1. 基于容器创建
    docker commit -m "创建新镜像，基于xx容器" based_container new_image_id:[tag]
+   docker commit [options] container  repository[:tag]
+   options: 
+   	-a --author=""
+   	-m --message=""
+   	-p --pause=true 
+
+   example: docker commit -m "add a file" -a "docker-root" a92abcxx8799 new_repository_nm
+
    
 2. 基于本地模版导入
    
@@ -63,8 +86,10 @@ docker push image_name:[tag]
 创建容器并处于停止状态，启动容器
 docker create -it image_id
 docker start container_id
+
 创建并同时启动容器,执行指定指令，centos代表的是image名
 docker run centos /bin/echo 'hello world'
+
 如果一个容器已经停止，则必须用run方法进行启动
 docker run image
 以守护进程的方式运行容器
