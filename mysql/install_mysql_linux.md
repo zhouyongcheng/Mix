@@ -1,16 +1,17 @@
 # 用二进制包安装mysql
-> download mysql
+> download mysql  mysql-8.0.12-linux-glibc2.12-x86_64.tar.xz
 
-`http://www.baidu.com`
-
-
-> 下面的操作用root账号进行操作。
-
+## copy my.cnf /etc/my.cnf
+--------------------------------
 * linux的默认查找优先级
 1)--default-files=/path/to/my.cnf
 2)/etc/my.cnf
 3)/etc/mysql/my.cnf
 4)$MYSQL_HOME/my.cnf
+--------------------------------
+
+/etc/my.cnf content
+----------------------------------------
 ````
 [client]
 no-beep
@@ -87,32 +88,38 @@ sync_relay_log_info=10000
 
 
 ```
-install mysql5.7.6^
+install mysql58 process using root account
+-------------------------------------
 mkdir /data01/
-mkdir /data01/mysql/data temp log uploads
-------------------------------------
-groupadd mysqls
+groupadd mysql
 useradd -r -g mysql -s /bin/false mysql
 cd /data01/
-tar zxvf mysql-version.tar.gz
+tar xvf mysql-version.tar.gz
 mv mysql-version mysql
 cd mysql
-mkdir mysql-files
+mkdir data log temp uploads
 chown -R mysql .
 chgrp -R mysql .
 bin/mysqld --initialize --user=mysql
 bin/mysql_ssl_rsa_setup
 chown -R root .
-chwon -R  mysql data log temp uploads mysql-files
+chown -R  mysql data log temp uploads
 bin/mysqld_safe --user=mysql &
+cd /usr/local
+ln -s /data01/mysql mysql
+cp support-files/mysql.server /etc/init.d/
 ```
 
 #postinstall
 ------------------------------------
 bin/mysql -uroot -pxxxxx   (/data01/mysql/log/mysql.err temp password)
-set password=PASSWORD('123456!');
+
+alter user ‘root’@’localhost’ identified by 'cmwin@110!';
+
 alter user 'root'@'localhost' PASSWORD EXPIRE NEVER;
-flush privilege;
+flush privileges;
 
 root@localhost: BOQoL!Zeg1lx
+root@localhost: :GdsWh=;;9m!  20180901
+cmwin@110!
 
