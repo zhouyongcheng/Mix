@@ -9,3 +9,6 @@ RUN bash -c 'touch /app.jar'
 EXPOSE 4001
 # 容器启动后执行的指令
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
+
+
+# docker run -p 80:80 -d amy/nginx:v1

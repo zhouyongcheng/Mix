@@ -109,10 +109,10 @@ echo "export PATH=/data/mysql/scripts:\$PATH" >> ~/.bash_profile
 source ~/.bash_profile
 
 # 删除数据库
-drop database db_name;
+drop database if exists db_name;
 
 # 创建数据库
-create database db_name;
+create database if not exists db_name default character set = utf8  collate = xxxx;
 
 #查看mysql中创建的数据库
 1) show databases;
@@ -186,7 +186,7 @@ show table status like 't_mytable'\G;
 ----------------------------------------------------
 
 
-
+mysql> show warnings;
 
 
 
