@@ -19,7 +19,20 @@ src/redis-cli shutdown NOSAVEc
 # admin command
 >start redis server
 
-`src/redis-server`
+`src/redis-server /etc/redis.conf`
+
+```
+启动redis-server,并以守护进程的方式运行，在redis.conf文件中 daemonize=yes
+```
+
+## redis启动设置为服务形式启动
+将安装目录…/redis-3.0.3/utils下的启动脚本文件redis_init_script拷贝到/etc/init.d下，并重命名为redisd
+修改/etc/init.d/redisd文件：添加# chkconfig: 2345 90 10
+>90表示服务启动执行的优先级，10表示服务被关闭的优先级
+添加服务: chkconfig --add redisd
+根据启动脚本中配置文件路径，新建配置文件目录，拷贝文件到该目录下
+cp /usr/local/redis/redis-3.0.3/redis.conf   /etc/redis/6379.conf
+
 
 ```
 src/redis-server /path/to/redis.conf --loglevel warning
