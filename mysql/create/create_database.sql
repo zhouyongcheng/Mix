@@ -1,3 +1,6 @@
+drop [database | schema] if exists db_name;
+
+
 create database cmwin character set utf8;
 
 

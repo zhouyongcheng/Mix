@@ -9,3 +9,7 @@ curl http://localhost:4001/greet
 netstat -tunlp
 
 ````
+
+## confirm linux versios
+lsb_release -a
+
