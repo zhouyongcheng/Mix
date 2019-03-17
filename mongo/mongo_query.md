@@ -10,10 +10,36 @@ db.test.save({})
 - 查询并输出内容  
 db.todo.find().forEach(printjson);
 
+
+- 查询中，如果和key进行匹配的是一个对象，则必须和该对象完全匹配才能获取数据。
+-- 可以使用limit和skip实现分页功能。
+- 查询中使用点号[.] 	子对象或者数组对象中使用。（对象型），查找文档中的内嵌信息（数组及对象型）
+
+## 聚集【命令】
+```
+db.media.count()
+db.media.find({type: 'CD'}).count()   -- 默认情况会忽略limit和skip语句进行统计。
+db.media.find({type: 'CD'}).count(true)   --不忽略limit和skip语句进行统计。
+db.media.distinct("title");                 -- 返回文档的title数组结果。
+db.media.distinct("product.color")
+db.media.group({
+	key ： {Title: true},
+	initial: {Total: 0},
+	reduce: function(items, prev) {
+			prev.Total += 13;
+	}
+})
+```
+
+
 db.media.find({released: {$all: ['2001', '2009']}})
 
 db.media.find({released: {$in: ['2001', '2017']}})
 
+-- 获取单个文档
+db.media.findOne().pretty();
+
+## 使用条件操作符
 - 大于，大于等于，小于，小于等于  
 db.media.find({released: {$gt: '2017'}})
 db.media.find({released: {$gte: '2017'}})

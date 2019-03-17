@@ -1,3 +1,6 @@
+##update node to latest version
+
+
 ## update and install angular/cli
 npm uninstall -g @angular/cli
 npm uninstall -g angular-cli

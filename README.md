@@ -1,4 +1,3 @@
-# Mix
 container for sharing
 plan for introducing mysql
 
@@ -27,3 +26,5 @@ https://github.com/Farata/angular2typescript
 
 ## how to untrack file and keep local file
 git rm --cached file_name
+
+i love this game
