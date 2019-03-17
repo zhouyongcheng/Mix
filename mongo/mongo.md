@@ -24,6 +24,7 @@
  > use dbname
  > show collections
  > show users
+ > db.audit.validate()   -- 检测一个集合状态。
  >db.createCollection("audit", {capped:true, size: 20480})    -创建固定大小集合
  >db.audit.find().sort({$natural: -1}).limit(10)   -- 获取固定集合中的最后10条记录。
 ```
