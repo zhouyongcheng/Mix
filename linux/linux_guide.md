@@ -13,3 +13,11 @@ netstat -tunlp
 ## confirm linux versios
 lsb_release -a
 
+## add sudo user
+
+
+curl -s clientId:secretId@localhost:4001/oauth/token  \
+ -d grant_type=client_credentials \
+ -d scope=app
+
+## install git on linux 
