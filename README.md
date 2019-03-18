@@ -10,7 +10,7 @@ ssh-keygen -t rsa -C "register@mail"
 ssh -T git@github.com
 
 git config --global user.name "githubusername"
-git config --global user.email "register@mail"
+git config --global user.email "yongchengzhou@hotmail.com"
 
 #https://git store password avoid input every time
 git config --global credential.helper store
