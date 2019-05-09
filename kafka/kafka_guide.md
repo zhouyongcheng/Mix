@@ -3,7 +3,7 @@ $(Kafka monitor)[https://github.com/quantifind/KafkaOffsetMonitor]
 # install kafka
 # start kafka
 before starting kafka, zookeeper is already configured in the config/server.properties
-* bin/kafka-server-start.sh config/server.properties
+* bin/kafka-server-start.sh  -daemon /home/cmwin/software/kafka/config/server.properties
 * bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test
 * bin/kafka-topics.sh --list --zookeeper localhost:2181
 * bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
@@ -14,8 +14,10 @@ before starting kafka, zookeeper is already configured in the config/server.prop
 
 ## server.properties configuration metadata
 
+## 必须配置的项目
 ```
-broker.id=0  
+broker.id=0
+port=9092           端口小于1024，则必须以root的身份运行，kafka不推荐用root运行。
 num.network.threads=2  
 num.io.threads=8  
 socket.send.buffer.bytes=1048576  
