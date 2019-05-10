@@ -99,6 +99,8 @@ db.todo.aggregate({$group: {_id: "$category", count: {$sum: 1}}});
 ```
 db.todo.update({label: 'game'}, {$set: {title: 'basketball'}})
 db.todo.update({label: 'game'}, {$unset: {address: 1}})
+{$set: {"company", "dha"}}   -- 在集合中添加一个字段
+{$unset: {"company": ""}}
 {$inc: {age: 5}}
 {$unset: {address : 1}}
 {$push: {'book': 'java in action'}}
@@ -115,6 +117,7 @@ db.todo.update({label: 'game'}, {$unset: {address: 1}})
 ## 删除记录
 ```
 db.todo.remove({label: 'game'})
+db.todo.drop()  -删除一个集合
 ```
 
 
