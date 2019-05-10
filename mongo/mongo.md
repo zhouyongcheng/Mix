@@ -29,10 +29,11 @@
  >db.audit.find().sort({$natural: -1}).limit(10)   -- 获取固定集合中的最后10条记录。
 ```
 
-## mongo.conf example
+## mongo.conf 配置文件常用内容
 ```
 dbpath = /home/cmwin/data/db
 logpath = /home/cmwin/data/log
+-- 日志功能，数据库宕机后的恢复基础文件
 journal = true
 port = 5000
 auth = true
@@ -45,6 +46,7 @@ mongo --port 5000 --host 192.168.0.1 --username cmwin --password admin123 --auth
 ```
 
 ## backup mongodb server(all database will be backuped)
+## 当前instance下的所有数据库都会被备份
  * mkdir ~/mongobak
  * cd ~/mongobak
  * ./mongodump
@@ -192,6 +194,7 @@ rest=true
 
 # 数据的导入导出: mongoimport
 ````
+mongoimport --d mnct --c T_D_PRODUCT_SELL_OUT  --type csv --file /home/cmwin/data/mnct/MNCTPRO_MNCT_T_D_PRODUCT_SELL_OUT.csv --headerline
 mongoimport -d blog -c student -u cmwin -p cmwin --type csv --file ~/tmp/student.csv --headerline
 mongoexport -d blog -c student -u cmwin -p cmwin -q {} -f _id,Title,Message,Author --csv > blogposts.csv
 ````

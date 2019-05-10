@@ -55,8 +55,12 @@ tag代表数组，tag: ['java','db', 'javascript']
 1. 数组中包含某个值
 db.todo.find({tag: 'java'})
 
-2. 同时包含几个值
+2. 同时包含几个值, tag数组中必须同时有java. db两个值。
 db.todo.find({tag: {$all: ['java','db']}})
+db.todo.find({name: 'xxxx'}, {"job": {$slice: [1,2]}} )
+
+db.media.find({release: {$mod: [2,1]}})  -- 获取发现年份为奇数的文档。
+db.media.find({TrackList: {$size: 2}})  --获取traclist长度为2的文档。
 ```
 
 - 内嵌文档的查询
@@ -72,7 +76,7 @@ db.media.find({released: {$mod : [2, 1]}})
 db.media.find({tracklist: {$size: 2}})
 db.media.find({operation: {$exists: true}})
 db.media.find({operation: {$exists: false}})
-db.media.find({tracklist: {$elemMatch: {type:'DVD', released: {$gt: 2017}}}})
+db.media.find({tracklist: {$elemMatch: {type:'DVD', released: {$gt: 2017}}}})   --匹配完整数组
 db.media.find({tracklist: {$not: {$elemMatch: {type:'DVD', released: '2012'}}})
 db.media.find({title: /Java*/i})
 db.media.find({"name": /(zhou|li)*/i})
