@@ -34,3 +34,16 @@ log.cleaner.enable=false
 zookeeper.connect=localhost:2181  
 zookeeper.connection.timeout.ms=1000000
 ```
+
+# 客户端连接
+```
+zkCli.sh -server localhost:2181
+
+```
+
+# zookeeper集群安装
+```
+* 在集群中的每个机器都解压zookeeper，然后配置，每个机器上的zoo.cfg文件都一样，配置好一个，复制就行。
+
+```
+

@@ -175,13 +175,13 @@ rest=true
 * db.fs.files.find()
 
 ## 索引功能(index)
-- db.posts.ensureIndex({Tags: 1})
+- db.posts.ensureIndex({Tags: 1})               -- 单键索引
 - db.posts.ensureIndex({Tags: -1})
-- db.posts.ensureIndex({"name":1, "age": -1})
+- db.posts.ensureIndex({"name":1, "age": -1})   -- 复合索引
 - db.posts.ensureIndex({"comments.count", 1})
 - db.posts.dropIndexes();
 - db.posts.dropIndex({"name": 1})
-- db.posts.ensureIndex({"name": 1}, {"unique": true})
+- db.posts.ensureIndex({"name": 1}, {"unique": true})   -- 唯一索引
 - db.posts.ensureIndex({"name": 1}, {"unique": true, "dropDups": true})
 - db.posts.ensureIndex({"name":1, "age": 1}, {"unique": true})
 - db.posts.reIndex();
@@ -325,6 +325,18 @@ rs.syncFrom("hostaname:port")
  ```
  rs.stepDown()    -- 强制进行新的选举
  db.isMaster()   -- 判断是不是主节点。
+ rs.debug.getLastOpWritten();   // 最后一次日志写入日期。
+ db.adminCommand({replSetGetStatus:1})   // 显示被选择用于同步数据的实例。
+ ```
+
+ # 初始化复制
+ ```
+ 1） 节点首次启动，还没有数据的时候，会进行复制。
+ 2） 节点过时，主节点已经重写oplog, 从节点数据会被清空，然后初始化。
+ 操作步骤：
+  所有的数据库都会被clone
+  通过主节点的oplog， 重建复制节点的数据。
+  在所有的节点上构建索引。
 
  ```
 
