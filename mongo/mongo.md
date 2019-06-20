@@ -17,6 +17,8 @@
  kill -15 pid
  但不要用kill -9 pid,会导致数据库数据损坏。
 
+
+
 ## 常用命令
  mongo
  >version()
@@ -29,11 +31,10 @@
  >db.audit.find().sort({$natural: -1}).limit(10)   -- 获取固定集合中的最后10条记录。
 ```
 
-## mongo.conf 配置文件常用内容
+## mongo.conf example
 ```
 dbpath = /home/cmwin/data/db
 logpath = /home/cmwin/data/log
--- 日志功能，数据库宕机后的恢复基础文件
 journal = true
 port = 5000
 auth = true
@@ -46,7 +47,6 @@ mongo --port 5000 --host 192.168.0.1 --username cmwin --password admin123 --auth
 ```
 
 ## backup mongodb server(all database will be backuped)
-## 当前instance下的所有数据库都会被备份
  * mkdir ~/mongobak
  * cd ~/mongobak
  * ./mongodump
@@ -175,13 +175,13 @@ rest=true
 * db.fs.files.find()
 
 ## 索引功能(index)
-- db.posts.ensureIndex({Tags: 1})               -- 单键索引
+- db.posts.ensureIndex({Tags: 1})
 - db.posts.ensureIndex({Tags: -1})
-- db.posts.ensureIndex({"name":1, "age": -1})   -- 复合索引
+- db.posts.ensureIndex({"name":1, "age": -1})
 - db.posts.ensureIndex({"comments.count", 1})
 - db.posts.dropIndexes();
 - db.posts.dropIndex({"name": 1})
-- db.posts.ensureIndex({"name": 1}, {"unique": true})   -- 唯一索引
+- db.posts.ensureIndex({"name": 1}, {"unique": true})
 - db.posts.ensureIndex({"name": 1}, {"unique": true, "dropDups": true})
 - db.posts.ensureIndex({"name":1, "age": 1}, {"unique": true})
 - db.posts.reIndex();
@@ -194,7 +194,6 @@ rest=true
 
 # 数据的导入导出: mongoimport
 ````
-mongoimport --d mnct --c T_D_PRODUCT_SELL_OUT  --type csv --file /home/cmwin/data/mnct/MNCTPRO_MNCT_T_D_PRODUCT_SELL_OUT.csv --headerline
 mongoimport -d blog -c student -u cmwin -p cmwin --type csv --file ~/tmp/student.csv --headerline
 mongoexport -d blog -c student -u cmwin -p cmwin -q {} -f _id,Title,Message,Author --csv > blogposts.csv
 ````
@@ -325,18 +324,6 @@ rs.syncFrom("hostaname:port")
  ```
  rs.stepDown()    -- 强制进行新的选举
  db.isMaster()   -- 判断是不是主节点。
- rs.debug.getLastOpWritten();   // 最后一次日志写入日期。
- db.adminCommand({replSetGetStatus:1})   // 显示被选择用于同步数据的实例。
- ```
-
- # 初始化复制
- ```
- 1） 节点首次启动，还没有数据的时候，会进行复制。
- 2） 节点过时，主节点已经重写oplog, 从节点数据会被清空，然后初始化。
- 操作步骤：
-  所有的数据库都会被clone
-  通过主节点的oplog， 重建复制节点的数据。
-  在所有的节点上构建索引。
 
  ```
 
