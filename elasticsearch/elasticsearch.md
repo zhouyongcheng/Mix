@@ -31,6 +31,7 @@ sudo journalctl -u elasticsearch
 # Configuring Elasticsearch
 Elasticsearch data is stored in the /var/lib/elasticsearch directory, configuration files are located in /etc/elasticsearch
 
+<<<<<<< HEAD
 # elastichsearch api
 > GET /_cluster/health/indexName
 > get /_cluster/health?level=indices
@@ -52,3 +53,38 @@ Elasticsearch data is stored in the /var/lib/elasticsearch directory, configurat
 >/_cat/allocation?v
 >/_cat/shards?v
 >/_cat/plugins?v
+=======
+# uninstall elasticsearch from ubuntu
+-------------------
+-- To remove the elasticsearch package and any other dependant package which are no longer needed from Ubuntu Xenial.
+sudo apt-get remove --auto-remove elasticsearch
+sudo apt-get purge elasticsearch
+sudo apt-get purge --auto-remove elasticsearch
+
+
+1) start_zookeeper
+2) start_kafka
+3) start_logstash
+$LOGSTASH_HOME/bin/logstash -f /data01/logstash/logstash-kafka.conf
+
+4) start_elasticsearch
+
+
+curl -X GET 'http://localhost:9200/_cat/indices?v
+
+curl 'localhost:9200/_mapping?pretty=true'
+
+curl 'localhost:9200/sell_out_log/sell_out_log/620fcc3c-e1cc-4ba0-a7a7-808386eb3b39?pretty=true'
+
+curl 'localhost:9200/sell_out_log?pretty=true'
+
+curl http://localhost:9200/_cat/indices
+
+curl -XDELETE http://localhost:9200/sell_out_log
+
+http://localhost:9200/sell_out_log/doc/GMZ3-GoBaHpSWzYSy3Ko
+
+http://localhost:9200/sell_out_log/doc/_search  
+
+http://localhost:9200/_cluster/health
+>>>>>>> 6644e18cdd501786369c5842b0f6666ccefc2be8

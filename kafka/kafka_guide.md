@@ -2,6 +2,8 @@ $(Kafka monitor)[https://github.com/quantifind/KafkaOffsetMonitor]
 
 https://thepracticaldeveloper.com/2018/11/24/spring-boot-kafka-config/
 
+(spring-boot|kafka)[https://blog.csdn.net/cowbin2012/article/details/85407495]
+
 # install kafka
 # start kafka
 before starting kafka, zookeeper is already configured in the config/server.properties
