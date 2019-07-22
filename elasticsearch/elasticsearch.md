@@ -31,7 +31,6 @@ sudo journalctl -u elasticsearch
 # Configuring Elasticsearch
 Elasticsearch data is stored in the /var/lib/elasticsearch directory, configuration files are located in /etc/elasticsearch
 
-<<<<<<< HEAD
 # elastichsearch api
 > GET /_cluster/health/indexName
 > get /_cluster/health?level=indices
@@ -53,7 +52,8 @@ Elasticsearch data is stored in the /var/lib/elasticsearch directory, configurat
 >/_cat/allocation?v
 >/_cat/shards?v
 >/_cat/plugins?v
-=======
+
+
 # uninstall elasticsearch from ubuntu
 -------------------
 -- To remove the elasticsearch package and any other dependant package which are no longer needed from Ubuntu Xenial.
@@ -87,4 +87,4 @@ http://localhost:9200/sell_out_log/doc/GMZ3-GoBaHpSWzYSy3Ko
 http://localhost:9200/sell_out_log/doc/_search  
 
 http://localhost:9200/_cluster/health
->>>>>>> 6644e18cdd501786369c5842b0f6666ccefc2be8
+
