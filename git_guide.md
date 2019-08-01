@@ -4,3 +4,6 @@ git remote add origin git@github.com:michaelliao/learngit.git
 git push -u origin master
 -- 只推送
 git push origin master
+
+-- 如果从零开始开发，先建立远程仓库，然后在本地进行clone。
+

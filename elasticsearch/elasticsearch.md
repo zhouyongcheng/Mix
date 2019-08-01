@@ -26,6 +26,15 @@ sudo systemctl start elasticsearch.service
 curl -X GET "localhost:9200/"
 
 
+# elasticsearch.yml
+```
+-- 禁止自动创建index
+action.auto_create_index: false
+```
+
+
+
+
 sudo journalctl -u elasticsearch
 
 # Configuring Elasticsearch
@@ -69,8 +78,9 @@ $LOGSTASH_HOME/bin/logstash -f /data01/logstash/logstash-kafka.conf
 
 4) start_elasticsearch
 
+-- 查询所有的索引信息
+curl -XGET 'http://localhost:9200/_cat/indices?v
 
-curl -X GET 'http://localhost:9200/_cat/indices?v
 
 curl 'localhost:9200/_mapping?pretty=true'
 
@@ -80,11 +90,119 @@ curl 'localhost:9200/sell_out_log?pretty=true'
 
 curl http://localhost:9200/_cat/indices
 
-curl -XDELETE http://localhost:9200/sell_out_log
+-- 获取索引
+GET http://localhost:9200/idx_name
+GET http://localhost:9200/idx_name/_settings,_mappings
+
+--打开索引
+post http://localhost:9200/idx_name/_open
+
+-- 关闭索引
+post http://localhost:9200/idx_name/_close
+
+
+-- 删除索引
+-XDELETE http://localhost:9200/idx_name
+
+-- 删除多个索引
+-XDELETE http://localhost:9200/idx_name1,idx_name2
 
 http://localhost:9200/sell_out_log/doc/GMZ3-GoBaHpSWzYSy3Ko
 
 http://localhost:9200/sell_out_log/doc/_search  
 
 http://localhost:9200/_cluster/health
+
+-- 查询所有文档
+http://localhost:9200/sell_out_report_idx/_search
+
+-- 按照某个字段匹配查询
+http://localhost:9200/sell_out_report_idx/_search?q=status:1
+
+-- 分页查询
+http://localhost:9200/sell_out_report_idx/_search?from=0&size=10
+
+-- 修改setting内容
+PUT /my_temp_index/_settings
+{
+"number_of_replicas": 1
+}
+
+-- 创建索引
+put http://localhost:9200/idx_name -H 'Content-Type:application/json' -d '
+{
+	"settings" :{
+		"number_of_shards" : 3,
+		"number_of_replicas" 2
+	},
+	"mappings" : {
+	   "type_name" : {
+			"properties" : {
+				"name" : "text"
+			}
+	   }
+	}
+}	
+'
+
+-- 索引映射管理
+put http://localhost:9200/idx_name -H 'Content-Type:application/json' -d '
+{
+	"mappings" : {
+		"type_name" : {
+			"properties" : {
+				"message" : {
+					"type" : "text"
+				}
+			}
+		}
+	}
+}
+'
+
+-- 获取mapping信息
+get http://localhost:9200/idx_name/_mapping/map_name
+
+-- 别名管理
+-- 添加别名
+post http://localhost:9200/_aliases -H 'Content-Type:application/json' -d '
+{
+	"actions" : [
+	{
+		"remove" : {
+			"index" : "index_name",
+			"alias" : "alias_name"
+		}
+	},
+	{
+		"add" : {
+			"index" : "index_name",
+			"alias" : "alias_name"
+		}
+	}
+	]
+}
+'
+
+-- 删除别名
+delete http://localhost:9200/idx_name/_alias/alias_name
+
+-- 查询别名
+get http://localhost:9200/idx_name/_alias/*
+
+
+-- 创建完索引后可以添加分词器，但先要关闭索引，修改后在打开。
+post http://localhost:9200/idx_name/_close
+put http://localhost:9200/idx_name/_settings -H 'Content-Type:application/json' -d '
+{
+	"analysis" : {
+		"analyzer" : {
+			"content" : {
+				"type" : "customer",
+				"tokenizer" : "whitespace"
+			}
+		}
+	}
+}	
+'
 
