@@ -1,3 +1,6 @@
+# pass parameter
+https://discuss.elastic.co/t/solved-painless-parameters-passing-from-java-code/117079
+
 # springboot es api
 [HighRichClientApi](https://blog.csdn.net/u010011737/article/details/79041125)
 
@@ -118,6 +121,7 @@ curl 'localhost:9200/sell_out_log?pretty=true'
 
 curl http://localhost:9200/_cat/indices
 
+
 curl -XDELETE http://localhost:9200/sell_out_log
 
 http://localhost:9200/sell_out_log/doc/GMZ3-GoBaHpSWzYSy3Ko
@@ -130,19 +134,20 @@ http://localhost:9200/_cluster/health
 
 
 
-curl -XPOST localhost:9200/_aliases -d '
+
+curl -XPOST localhost:9200/_aliases -H 'Content-Type: application/json' -d '
 {
     "actions": [
         { 
         	"remove": {
             	"alias": "sell_out_report_idx",
-            	"index": "sell_out_report_idx_v1"
+            	"index": "sell_out_report_idx_v2"
         	}
     	},
         { 
         	"add": {
             	"alias": "sell_out_report_idx",
-            	"index": "sell_out_report_idx_v2"
+            	"index": "sell_out_report_idx_v3"
         	}
     	}
     ]
