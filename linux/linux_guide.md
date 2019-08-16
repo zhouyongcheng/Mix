@@ -1,4 +1,8 @@
 ## curl日常使用
+
+## 下载文件
+curl -L -O  http://www.xxx.xx/file.tar
+
 ````
 curl --version
 curl http://localhost:4001/greet
