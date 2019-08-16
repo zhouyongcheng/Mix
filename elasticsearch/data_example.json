@@ -1,0 +1,132 @@
+{
+  "took": 61,
+  "timed_out": false,
+  "_shards": {
+    "total": 5,
+    "successful": 5,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": 4,
+    "max_score": 0.6931472,
+    "hits": [
+      {
+        "_index": "sell_out_report_idx_v3",
+        "_type": "sell_out_report_idx",
+        "_id": "ba70202b-c7d5-49f2-b1f3-2e5593e5c81c",
+        "_score": 0.6931472,
+        "_source": {
+          "traceId": "7debda0d-9e7e-4f3a-90fb-2f215172abba",
+          "guid": "368d2497-dd07-448b-9d5a-9031ef7f72d5",
+          "marketCode": "14",
+          "marketName": "哈尔滨",
+          "dmId": "100054861",
+          "dmName": "黎莉",
+          "amId": "100054861",
+          "amName": "郭志勇",
+          "keyId": "14f637ab-d429-4fcd-abf9-95c1c7936924",
+          "status": 0,
+          "statusName": "0",
+          "outstockTime": "2019-07-31 10:54:00",
+          "outstockHour": "10:54:00",
+          "recoverTime": "2019-08-01 10:54:00",
+          "recoverHour": "10:54:00",
+          "updateId": "101939460",
+          "updateTime": "2019-07-31 10:54:33.798",
+          "channel": "Pre-Order,10001,Self-Order,0,Dine-In"
+        }
+      },
+      {
+        "_index": "sell_out_report_idx_v3",
+        "_type": "sell_out_report_idx",
+        "_id": "59be8555-46c6-482d-8d7a-8b57c56073a0",
+        "_score": 0.6931472,
+        "_source": {
+          "traceId": "2f5ab9bb-52a3-42a6-a1a2-ab734d909782",
+          "guid": "0e523dca-5dc2-4bb7-bb42-6f65bf25064e",
+          "marketCode": "14",
+          "marketName": "哈尔滨",
+          "dmId": "100054861",
+          "dmName": "黎莉",
+          "amId": "100054861",
+          "amName": "郭志勇",
+          "keyId": "595661bb-996b-4c6e-b9c3-9f1fdb75e3ff",
+          "status": 0,
+          "statusName": "0",
+          "outstockTime": "2019-07-31 10:55:00",
+          "outstockHour": "10:55:00",
+          "recoverTime": "2019-08-01 10:55:00",
+          "recoverHour": "10:55:00",
+          "updateId": "101939460",
+          "updateTime": "2019-07-31 10:55:41.789",
+          "channel": "Pre-Order,10001,Self-Order,0,Dine-In"
+        }
+      },
+      {
+        "_index": "sell_out_report_idx_v3",
+        "_type": "sell_out_report_idx",
+        "_id": "079b4a2e-d7df-47c2-9319-87df7a530473",
+        "_score": 0.18232156,
+        "_source": {
+          "traceId": "2f5ab9bb-52a3-42a6-a1a2-ab734d909782",
+          "guid": "5567c7d7-e298-4245-829b-eaca5c3d75b8",
+          "marketCode": "14",
+          "marketName": "哈尔滨",
+          "dmId": "100054861",
+          "dmName": "黎莉",
+          "amId": "100054861",
+          "amName": "郭志勇",
+          "keyId": "14cb86b0-36ab-4a3b-8073-78649c86efac",
+          "status": 0,
+          "statusName": "0",
+          "outstockTime": "2019-07-31 10:55:00",
+          "outstockHour": "10:55:00",
+          "recoverTime": "2019-08-01 10:55:00",
+          "recoverHour": "10:55:00",
+          "updateId": "101939460",
+          "updateTime": "2019-07-31 10:55:41.789",
+          "channel": "Pre-Order,10001,Self-Order,0,Dine-In"
+        }
+      },
+      {
+        "_index": "sell_out_report_idx_v3",
+        "_type": "sell_out_report_idx",
+        "_id": "deb045f3-7606-4b8e-8d17-c6e265f4a18c",
+        "_score": 0.18232156,
+        "_source": {
+          "traceId": "60a4d3fb-6f7c-4eb0-93eb-ea8ea9f03a5e",
+          "guid": "368d2497-dd07-448b-9d5a-9031ef7f72d5",
+          "marketCode": "14",
+          "marketName": "哈尔滨",
+          "dmId": "100054861",
+          "dmName": "黎莉",
+          "amId": "100054861",
+          "amName": "郭志勇",
+          "keyId": "14f637ab-d429-4fcd-abf9-95c1c7936924",
+          "status": 2,
+          "statusName": "2",
+          "outstockTime": "2019-07-31 10:54:00",
+          "outstockHour": "10:54:00",
+          "updateId": "101939460",
+          "updateTime": "2019-07-31 10:57:16.575",
+          "deleteId": "101939460",
+          "deleteTime": "2019-07-31 10:57:16.575",
+          "channel": "Pre-Order,10001,Self-Order,0,Dine-In"
+        }
+      }
+    ]
+  },
+  "aggregations": {
+    "sterms#guid_group": {
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 0,
+      "buckets": [
+        {
+          "key": "368d2497-dd07-448b-9d5a-9031ef7f72d5",
+          "doc_count": 2
+        }
+      ]
+    }
+  }
+}
