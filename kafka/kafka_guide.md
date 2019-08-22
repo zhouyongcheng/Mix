@@ -12,9 +12,8 @@ before starting kafka, zookeeper is already configured in the config/server.prop
 * bin/kafka-topics.sh --list --zookeeper localhost:2181
 * bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
 * bin/kafka-console-consumer.sh --zookeeper localhost:2181 --topic test --from-beginning
-
- bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 3 --partitions 1 --topic my-replicated-topic
- bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic my-replicated-topic
+*  bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 3 --partitions 1 --topic my-replicated-topic
+ * bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic my-replicated-topic
 
 ## server.properties configuration metadata
 
@@ -50,6 +49,7 @@ zkCli.sh -server localhost:2181
 * 在集群中的每个机器都解压zookeeper，然后配置，每个机器上的zoo.cfg文件都一样，配置好一个，复制就行。
 
 ```
+
 
 
 
