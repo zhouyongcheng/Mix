@@ -18,3 +18,6 @@ create table todo (
 > ./mysql -uroot -p /home/cmwin/sql/create_tables.sql
 
 mysql> show variables like 'low_case_table_names'
+
+
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'cmwin@110!'
