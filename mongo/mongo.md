@@ -10,20 +10,40 @@
  mongod --dbpath /data/db
  mongod -f /etc/mongodb.cnf
  mongod --shutdown
- 
+ mongod --config /etc/mongod/mongod.conf 
  use admin | db.shutdownServer()
  
  kill -2 pid
  kill -15 pid
  但不要用kill -9 pid,会导致数据库数据损坏。
 
+
+
+## 常用命令
  mongo
  >version()
  > show dbs
  > use dbname
  > show collections
  > show users
- 
+ > db.audit.validate()   -- 检测一个集合状态。
+ >db.createCollection("audit", {capped:true, size: 20480})    -创建固定大小集合
+ >db.audit.find().sort({$natural: -1}).limit(10)   -- 获取固定集合中的最后10条记录。
+```
+
+## mongo.conf example
+```
+dbpath = /home/cmwin/data/db
+logpath = /home/cmwin/data/log
+journal = true
+port = 5000
+auth = true
+```
+
+## mongo client using
+```
+mongo --port 5000 --host 192.168.0.1 --username cmwin --password admin123 --authenticationDatabase admin
+
 ```
 
 ## backup mongodb server(all database will be backuped)
@@ -182,9 +202,10 @@ mongoexport -d blog -c student -u cmwin -p cmwin -q {} -f _id,Title,Message,Auth
 
 ## spring-boot mongodb integration
 
-# replication 
-- master-slave replication (主从复制)
-- master-master replication (主主复制)
+# replication （复制集）
+-- 在服务器上执行下面的命令，查看复制集的操作日志信息。
+ db.printReplicationInfo()
+ 
 - replication set (复制集)
 
 ## 复制集中的基本概念
@@ -193,7 +214,7 @@ mongoexport -d blog -c student -u cmwin -p cmwin -q {} -f _id,Title,Message,Auth
   1. {priority: 0} 不可能成为master，同步master数据，参与投票。
   2. {priority: 0, hidden: true}, 同步master数据，参与投票，客户端看不到。
   3. {priority: 0, hidden: true, delay: time}
-  4. Arbiters: 不同步master的数据，只参与投票选举的过程。
+  4. Arbiters: 仲裁服务器，不同步master的数据，只参与投票选举的过程。 
   5. {votes: 0} Non-voting: 仅仅不参与投票，其他功能都有。
   
   ```
@@ -212,29 +233,54 @@ mongoexport -d blog -c student -u cmwin -p cmwin -q {} -f _id,Title,Message,Auth
 4. 以配置参数调用rs.initiate(cfg),创建复制集。
 5. db.isMaster(),判断是否是主节点。
 
-操作步骤:
+如果不希望每个实例都占用一个shell，下面启动mongod是，可以添加参数 --fork 和 --logfile <file>, 这样在后台运行并输出日志到指定文件。
+mongod --dbpath /home/cmwin/db/active1/data  --port 27021  --fork  --logfile /home/cmwin/db/logs/log_27017.log  --replSet cmwinset
+
+
+复制集中的节点的限制，实际是指能够进行投票的节点的个数为基准进行计算的。 必须存活的节点数=总节点数/2+1
+
+创建复制集的操作步骤:
+
+## 启动复制集中的各个mongod instance.
 mkdir -p /home/cmwin/db/active1/data
-mongod --dbpaht /home/cmwin/db/active1/data  --port 27021 --replSet cmwinset/hostname:27021
+mongod --dbpath /home/cmwin/db/active1/data  --port 27021 --replSet cmwinset
 
 mkdir -p /home/cmwin/db/active2/data
-mongod --dbpaht /home/cmwin/db/active2/data  --port 27022 --replSet cmwinset/hostname:27021
+mongod --dbpath /home/cmwin/db/active2/data  --port 27022 --replSet cmwinset
 
 mkdir -p /home/cmwin/db/passive1/data
-mongod --dbpaht /home/cmwin/db/passive1/data --port 27023 --replSet cmwinset/hostname:27021
+mongod --dbphth /home/cmwin/db/passive1/data --port 27023 --replSet cmwinset
 
 mkdir -p /home/cmwin/db/arbiter1/data
-mongod --dbpath /home/cmwin/db/ariter1/data  --port 27024 --replSet cmwinset/hostname:27021 -rest
+mongod --dbpath /home/cmwin/db/ariter1/data  --port 27024 --replSet cmwinset  -rest
 
+## 任意一mongod instance上执行下面操作（计划的主服务器上进行操作）。
+*  初始化复制集
+*  添加成员到复制集中
 mongo localhost.localdomain:27021
->rs.initiate()
+>rs.initiate()     -- 使用默认参数初始化复制集
+-- 检查初始化后的状态。
+>rs.status()  
 >rs.add("localhost.localdomain:27022")
 >rs.add("localhost.localdomain:27023")
+
+## 复制配置文件，并且修改为设计的复制集信息
 >conf = rs.conf()
->conf.members[2].hidden = true
->conf.members[2].priority = 0
->conf.members[2].votes = 0
+>conf.members[2].hidden = true    -- 复制集的客户端看不到该节点，一般作为备份节点或者报表节点。即使客户端设置了读取偏好，也不能读取数据。
+>conf.members[2].priority = 0      -- 不会被选为master
+>conf.members[2].votes = 0            -- 不参与投票
+
+>conf.members[2].slaveDelay = xxxs   -- 该节点落后于主服务器的时间，由于容错设置，比如操作失败后，切换到及分钟前的状态（是否有实际意义？）
 >rs.reconfig(conf)
+
+-- 添加仲裁节点。
 >rs.addArb("localhost.localdomain:27024")
+
+# 辅助server上登陆查看信息。
+1）登陆辅助server。
+2）执行db.getMongo().setSlaveOk();
+3) 通过1，2，就可以直接在副本服务器上查看数据库文档信息。
+
 
 从复制集中移出服务器
 1. 关闭需要移出的服务器实例。
@@ -244,15 +290,22 @@ mongo localhost.localdomain:27021
 
 添加服务器到复制集中。
 1. 启动要加入的服务器instance.
-   mongod --dbpath /home/cmwin/db/active4/data --port 27025 --replSet  cmwinset/hostname:27021
+   mongod --dbpath /home/cmwin/db/active4/data --port 27025 --replSet  cmwinset
 2. 连接到主服务器instance
    use admin, rs.add("hostname:27025")
 
 添加arbiter实例
 1. 启动服务器instance.
 2. 连接主服务器的admin数据库，执行下面命令添加arbiter到集群中。
-   use admin, rs.addArb("hostname:27026");
+   use admin, rs.addArb("localhost.localdomain:27026");
 ```
+
+## 复制集的数据复制
+```
+通常情况下，辅助节点都是从主节点进行数据的复制，可以通过执行下面的命令，改变节点复制的数据来源。
+rs.syncFrom("hostaname:port")
+```
+
 
 ## 复制集中master的选举
 ```
@@ -266,5 +319,12 @@ mongo localhost.localdomain:27021
 ## mongodb的日志功能
 - 开启慢日志，可以对执行比较慢的查询进行分析。
 - 当进行主从复制集的时候，需要开启oplog，操作日志。
+
+## 复制集常用命令
+ ```
+ rs.stepDown()    -- 强制进行新的选举
+ db.isMaster()   -- 判断是不是主节点。
+
+ ```
 
 
