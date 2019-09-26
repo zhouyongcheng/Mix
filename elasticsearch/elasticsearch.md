@@ -267,3 +267,14 @@ curl -XPOST localhost:9200/_aliases -H 'Content-Type: application/json' -d '
     ]
 }
 '
+
+# delete document based on query condition
+curl -XPOST "http://localhost:9200/sell_out_report_idx/_delete_by_query?conflicts=proceed" -H 'Content-Type: application/json' -d '{
+    "query": {
+        "range" : {
+            "updateTime" : {
+                "lte" : "2019-09-03 17:30:52.000"
+            }
+        }
+    }
+}'
