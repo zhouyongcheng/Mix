@@ -16,6 +16,11 @@ before starting kafka, zookeeper is already configured in the config/server.prop
  bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 3 --partitions 1 --topic my-replicated-topic
  bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic my-replicated-topic
 
+
+bin/kafka-topics.sh --zookeeper localhost:2181 --alter --topic tp_product_sell_out_notification --partitions 9
+
+
+
 ## server.properties configuration metadata
 
 ## 必须配置的项目
@@ -50,6 +55,28 @@ zkCli.sh -server localhost:2181
 * 在集群中的每个机器都解压zookeeper，然后配置，每个机器上的zoo.cfg文件都一样，配置好一个，复制就行。
 
 ```
+
+
+WXI065  4   4   4   4  4
+WXI011  8   3   3   3  3   3
+ALN001  2   2   2   2  2   2
+
+
+http://localhost:9200/sell_out_report_idx/_doc/_search
+http://localhost:9200/sell_out_report_idx/_doc/_search
+
+
+es.connect.timeout = 1000;    // 连接超时时间
+es.socket.timeout = 30000;    // 连接超时时间
+es.connection.request.timeout = 500; // 获取连接的超时时间
+es.max.connect.num = 100; // 最大连接数
+es.max.connect.per.route = 100; // 最大路由连接数
+
+
+sudo ufw allow from 10.67.31.186
+
+
+
 
 
 
