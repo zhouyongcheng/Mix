@@ -1,3 +1,6 @@
+# pass parameter
+https://discuss.elastic.co/t/solved-painless-parameters-passing-from-java-code/117079
+
 # springboot es api
 [HighRichClientApi](https://blog.csdn.net/u010011737/article/details/79041125)
 
@@ -145,13 +148,15 @@ post http://localhost:9200/idx_name/_close
 -- 删除多个索引
 -XDELETE http://localhost:9200/idx_name1,idx_name2
 
+
+curl -XDELETE http://localhost:9200/sell_out_log
+
 http://localhost:9200/sell_out_log/doc/GMZ3-GoBaHpSWzYSy3Ko
 
 http://localhost:9200/sell_out_log/doc/_search  
 
 http://localhost:9200/_cluster/health
 
-<<<<<<< HEAD
 -- 查询所有文档
 http://localhost:9200/sell_out_report_idx/_search
 
@@ -245,27 +250,21 @@ put http://localhost:9200/idx_name/_settings -H 'Content-Type:application/json' 
 }	
 '
 
-=======
-
-
-
-
-curl -XPOST localhost:9200/_aliases -d '
+curl -XPOST localhost:9200/_aliases -H 'Content-Type: application/json' -d '
 {
     "actions": [
         { 
         	"remove": {
             	"alias": "sell_out_report_idx",
-            	"index": "sell_out_report_idx_v1"
+            	"index": "sell_out_report_idx_v2"
         	}
     	},
         { 
         	"add": {
             	"alias": "sell_out_report_idx",
-            	"index": "sell_out_report_idx_v2"
+            	"index": "sell_out_report_idx_v3"
         	}
     	}
     ]
 }
 '
->>>>>>> 4086e796f77e9008df04f3c8d72a62a02fc8a641

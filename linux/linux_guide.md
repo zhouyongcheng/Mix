@@ -1,4 +1,4 @@
-## curl日常使用
+﻿## curl日常使用
 ````
 curl --version
 curl http://localhost:4001/greet
@@ -53,3 +53,33 @@ sudo ufw allow/deny 8080
 sudo ufw allow/deny servicename
 sudo ufw delete allow/deny 20
 ```
+
+
+NFS扩容配置
+
+检查是否有nfs和rpc
+rpm -qa nfs-utils rpcbind
+没有的话就安装
+yum install -y nfs-utils rpcbind
+
+
+/etc/init.d/rpcbind status
+/etc/init.d/nfs start
+/etc/init.d/nfs status
+
+开机自启
+chkconfig nfs on
+chkconfig rpcbind on
+创建挂载目录
+mkdir -p /data
+chown -R nfsnobody.nfsnobody /data
+挂载
+mount -t nfs 172.20.193.33:/data /data
+df -h
+检查
+showmount -e 172.20.193.33
+
+
+mount -t nfs 172.25.216.21:/data /data
+
+修改/etc/hosts,并立刻生效

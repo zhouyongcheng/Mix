@@ -198,6 +198,11 @@ get http://localhost:9200/sell_out_report_idx_v3/sell_out_report_idx/_search
 }
 
 
+ grep '培根鸡腿重磅肉霸堡' /opt/log/wildfly/log-info_20190802.log | grep 'SHA499' 
+ 
+ 
+ EC发送通知请求数据：[storeCode = SHA499
+ 
 
 
 
