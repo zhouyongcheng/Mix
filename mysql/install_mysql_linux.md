@@ -118,8 +118,5 @@ alter user ‘root’@’localhost’ identified by 'cmwin@110!';
 
 alter user 'root'@'localhost' PASSWORD EXPIRE NEVER;
 flush privileges;
-
-root@localhost: BOQoL!Zeg1lx
-root@localhost: :GdsWh=;;9m!  20180901
 cmwin@110!
 

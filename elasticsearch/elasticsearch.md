@@ -122,7 +122,6 @@ $LOGSTASH_HOME/bin/logstash -f /data01/logstash/logstash-kafka.conf
 -- 查询所有的索引信息
 curl -XGET 'http://localhost:9200/_cat/indices?v
 
-
 curl 'localhost:9200/_mapping?pretty=true'
 
 curl 'localhost:9200/sell_out_log/sell_out_log/620fcc3c-e1cc-4ba0-a7a7-808386eb3b39?pretty=true'
