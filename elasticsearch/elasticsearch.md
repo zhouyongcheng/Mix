@@ -110,7 +110,6 @@ $LOGSTASH_HOME/bin/logstash -f /data01/logstash/logstash-kafka.conf
 
 4) start_elasticsearch
 
-
 curl -X GET 'http://localhost:9200/_cat/indices?v
 
 curl 'localhost:9200/_mapping?pretty=true'

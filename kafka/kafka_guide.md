@@ -12,9 +12,8 @@ before starting kafka, zookeeper is already configured in the config/server.prop
 * bin/kafka-topics.sh --list --zookeeper localhost:2181
 * bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
 * bin/kafka-console-consumer.sh --zookeeper localhost:2181 --topic test --from-beginning
-
- bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 3 --partitions 1 --topic my-replicated-topic
- bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic my-replicated-topic
+*  bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 3 --partitions 1 --topic my-replicated-topic
+ * bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic my-replicated-topic
 
 
 bin/kafka-topics.sh --zookeeper localhost:2181 --alter --topic tp_product_sell_out_notification --partitions 9
@@ -74,6 +73,7 @@ es.max.connect.per.route = 100; // 最大路由连接数
 
 
 sudo ufw allow from 10.67.31.186
+
 
 
 
