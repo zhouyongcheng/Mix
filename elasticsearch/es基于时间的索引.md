@@ -1,0 +1,1 @@
+[Elasticsearch 基于时间的索引](http://russellluo.com/2017/05/elasticsearch-time-based-indices.html)
