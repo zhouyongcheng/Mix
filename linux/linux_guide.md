@@ -59,12 +59,10 @@ sudo ufw delete allow/deny 20
 ```
 
 NFS扩容配置
-
 检查是否有nfs和rpc
 rpm -qa nfs-utils rpcbind
 没有的话就安装
 yum install -y nfs-utils rpcbind
-
 
 /etc/init.d/rpcbind status
 /etc/init.d/nfs start
