@@ -1,5 +1,12 @@
 # spring oauth2学习笔记
 
+## 问题点
+```
+scope是如何进行设定的，如何使用？有什么功能。  
+refresh_token的使用场景
+token持久化的作用什么？为什么要把token存入到数据库或者redis？
+```
+
 ## oauth2的作用
 * 用户只需要一个账户和密码，就能在各种客户端上访问有权使用的资源，无需在各个客户端进行注册。
   > 前提条件： 用户使用的资源系统有相应的授权服务器，并且各个客户端系统有访问客户资源的对接功能。
@@ -17,6 +24,7 @@
 
 **参考资料**
 [OAuth工作流程](https://www.jianshu.com/p/68f22f9a00ee)
+[授权码模式表定义](https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/test/resources/schema.sql)
 
 ## oauth的工作流程
 * 客户端需要把自己注册到授权服务器 （授权服务器提供注册客户端的界面或者数据库直接写入）
@@ -38,6 +46,14 @@
 （C）假设用户给予授权，授权服务器将用户导向客户端事先指定的“重定向URI”，并附上一个授权码。  
 （D）客户端收到授权码，和客户端设定的“重定向URI”向认证服务器申请令牌，申请令牌的过程是客户端的后台服务器上完成的，对用户不可见。  
 （E）认证服务器核对授权码和重定向URI，确认无误后向客户端发送访问令牌和更新令牌。   
+
+**测试流程**
+```
+(A) http://localhost:8000/oauth/token?code=83YUfj&scope=all&grant_type=authorization_code&redirect_uri=http://localhost:8082/showEmployees
+(B) curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d 'grant_type=authorization_code&code=Li4NZo&redirect_uri=http://localhost:8082/userinfo' "http://client:secret@localhost:8081/oauth/token"
+```
+
+
 
 **申请验证码的api接口**
 ```
@@ -167,11 +183,12 @@ authorities：客户端可使用的权限。
 
 JWT的处理  
 ```
- 1）使用 JWT 令牌需要在授权服务中使用 JWTTokenStore，资源服务器也需要一个解码 Token令牌的类 JwtAccessTokenConverter。  
- JwtTokenStore 依赖这个类进行编码以及解码，因此授权服务以及资源服务都需要配置这个转换类
-2）Token 令牌默认是有签名的，并且资源服务器中需要验证这个签名，因此需要一个对称的 Key 值，用来参与签名计算
+(A) JwtAccessTokenConverter担当了token的编码及解码过程，相当于jdbcTokenStore存放uuid类别的token功能。
+(B) 对jwt令牌进行签名的密钥，必须在授权服务器及资源服务器上都有，而且JwtAccessTokenConverter也要一样。
+(C) 使用 JWT 令牌需要在授权服务中使用 JWTTokenStore，资源服务器也需要一个解码 Token令牌的类 JwtAccessTokenConverter。JwtTokenStore 依赖这个类进行编码以及解码，因此授权服务以及资源服务都需要配置这个转换类
+(D)Token 令牌默认是有签名的，并且资源服务器中需要验证这个签名，因此需要一个对称的 Key 值，用来参与签名计算
 这个 Key 值存在于授权服务和资源服务之中
-3）者使用非对称加密算法加密 Token 进行签名，Public Key 公布在 /oauth/token_key 这个 URL 中默认 /oauth/token_key 的访问安全规则是 "denyAll()" 即关闭的，可以注入一个标准的 SpingEL 表达式到 AuthorizationServerSecurityConfigurer 配置类中将它开启，例如 permitAll()
+(E) 使用非对称加密算法加密 Token 进行签名，Public Key 公布在 /oauth/token_key 这个 URL 中默认 /oauth/token_key 的访问安全规则是 "denyAll()" 即关闭的，可以注入一个标准的 SpingEL 表达式到 AuthorizationServerSecurityConfigurer 配置类中将它开启，例如 permitAll()
 需要引入 spring-security-jwt 库
 ```
 
@@ -186,6 +203,7 @@ JWT的处理
 *  tokenGranter：完全自定义授权服务实现（TokenGranter接口实现），只有当标准的四种授权模式已无法满足需求时
 
 4. 配置授权端点（endpoint)
+> 授权端点的 URL 应该被 Spring Security 保护起来只供授权用户访问
 ```
 /oauth/authorize：授权端点
 /oauth/token：令牌端点
@@ -225,24 +243,31 @@ JWT的处理
 
    
 ## 资源服务器配置
-  - RemoteTokenServices 远程校验token是否合法（在授权服务器上进行校验）
-  - 资源服务器的HttpSecurity配置。
-  - ResourceServerSecurityConfigurer: 通常,资源服务器也作为授权服务器的客户端。、  配置资源服务器的tokenService(remoteTokenServices)
+* 要访问资源服务器受保护的资源需要携带令牌（从授权服务器获得）
+* 客户端往往同时也是一个资源服务器，各个服务之间的通信（访问需要权限的资源）时需携带访问令牌
+* OAuth2 为资源服务器配置提供ResourceServerProperties类，该类会读取配置文件中对资源服务器得配置信息（如授权服务器公钥访问地址)
+
+### 资源服务器的可配置项
+* tokenServices：ResourceServerTokenServices 类的实例，用来实现令牌业务逻辑服务
+* resourceId：这个资源服务的ID，这个属性是可选的，但是推荐设置并在授权服务中进行验证 
+* tokenExtractor 令牌提取器用来提取请求中的令牌
+* 请求匹配器，用来设置需要进行保护的资源路径，默认的情况下是受保护资源服务的全部路径
+* 受保护资源的访问规则，默认的规则是简单的身份验证（plain authenticated）
+* 其他的自定义权限保护规则通过 HttpSecurity 来进行配置
+
+### 解析令牌方法
+* 使用 DefaultTokenServices 在资源服务器本地配置令牌存储、解码、解析方式。 
+* 使用 RemoteTokenServices 资源服务器通过 HTTP 请求来解码令牌，每次都请求授权服务器端点/oauth/check_token。
+* 若授权服务器是 JWT 非对称加密，则需要请求授权服务器的 /oauth/token_key 来获取公钥 key 进行解码。
+* 资源服务器的HttpSecurity配置。设置资源服务器资源本身的安全。
+* 通常,资源服务器也作为授权服务器的客户端。 配置资源服务器的tokenService(remoteTokenServices)
+
+> 令牌解析
+资源服务器和授权服务器不在同一个应用，则需告诉资源服务器令牌如何存储与解析，并与授权服务器使用相同的密钥进行解密
 
 
-
-  - 客户端获取方式（客户端应用）也就是说每个访问授权服务器的应用都是客户端，需要注册到授权服务器中。
-  - 数据库方式加载客户端信息。(new JdbcClientDetailsService(dataSource)
-   
-
-## 资源服务器
-- 令牌的解析方式
-  -- 需要一个授权服务器匹配的令牌存储store, JwtTokenStore及对应的TokenConverter.     配置public key来解析token，确保是授权服务器生成的token，也就意味资源服务器必须信任授权服务器。
-  - 获取public key的方式，1）通过在资源服务器本地配置publickey。 
-   2）通过远程的方式，从授权服务器上获取public_key，然后进行验证。
-
-
-
-## WebSecurity配置信息
+## 客户端模块的开发
+* 客户端也需要实现存储用户的授权代码和访问令牌的功能。
+* 
 
  

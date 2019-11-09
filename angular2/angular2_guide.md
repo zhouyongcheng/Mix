@@ -12,4 +12,7 @@ npm install --save-dev @angular/cli@latest
 1）环境构建
   安装node
   安装typescript： npm install -g typescript
+
+  ## 安装node的准备
+  m
   
