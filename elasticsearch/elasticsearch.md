@@ -8,11 +8,26 @@ https://blog.csdn.net/yjclsx/article/details/86576946
 
 [ElasticSearch踩过的坑](https://www.jianshu.com/p/fa31f38d241e)
 
-# install
-https://linuxize.com/post/how-to-install-elasticsearch-on-centos-7/
 
-sudo rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
-sudo vi /etc/yum.repos.d/elasticsearch.repo
+## install header plugin
+```
+git clone git://github.com/mobz/elasticsearch-head.git
+cd elasticsearch-head
+npm install
+npm run start
+http://localhost:9100
+```
+
+
+## 停止es
+kill -9  pid_es
+
+## 创建起点服务
+sudo /sbin/chkconfig  --add elasticsearch
+sudo service elasticsearch status
+
+
+
 ---------------------------
 [elasticsearch-6.x]
 name=Elasticsearch repository for 6.x packages
@@ -82,7 +97,7 @@ sudo journalctl -u elasticsearch
 Elasticsearch data is stored in the /var/lib/elasticsearch directory, configuration files are located in /etc/elasticsearch
 
 # elastichsearch api
-> GET /_cluster/health/indexName
+> get /_cluster/health/indexName
 > get /_cluster/health?level=indices
 
 ## 获取集群的状态
@@ -95,13 +110,17 @@ Elasticsearch data is stored in the /var/lib/elasticsearch directory, configurat
 
 
 ## cat api
-> /_cat/health?v
->/_cat/indices?v
->/_cat/master?v
->/_cat/nodes?v
->/_cat/allocation?v
->/_cat/shards?v
->/_cat/plugins?v
+```
+/_cat/health?v
+/_cat/indices?v
+/_cat/master?v
+/_cat/nodes?v
+/_cat/allocation?v
+/_cat/shards?v
+/_cat/plugins?v
+/_cat/templates?v
+```
+
 
 
 # uninstall elasticsearch from ubuntu
