@@ -56,6 +56,7 @@ sudo systemctl start elasticsearch.service
     gateway.recovery_after_nodes:3
     node.max_local_storage_nodes: 1
     action.destructive_requires_name:true   -- 禁止通过通配符的方式进行删除索引
+    max.poll.records：
 
 ```
 * 启动，停止es

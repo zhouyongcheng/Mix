@@ -1,10 +1,32 @@
-# install mongodb
+## 为什么采用mongdb
+* 横向扩展方便，这样可以增加存储空间及提升性能。
+* 采用文档数据模型，自动在多台服务器间分割数据。
+* 提供通用索引功能，多种快速查询方式。
+* 支持mapreduce及其他的聚合功能，适用数据分析的统计。
+* 支持文件的存储（可按大文件，小文件采用不同的存储方式，图片，视频，文本等）
+* 管理方便，管理理念，尽可能让服务器自动配置，用户在必要的时候调整设置。
+* 多数据库并存，数据库间完全独立（权限，存储位置等）
+* mongodb在插入数据的时候不会执行代码，所以不会有注入式攻击的风险。
+☐
+
+## 注意事项
+* mongodb不仅区分类型，而且还区分大小写（键及值）
+* 同一个文档中，不能有重复的键。
+* 使用子集合的方式来组织数据是一种很好的方式（sellout.report, sellout.realtime)
+* admin数据库，把用户加到这个数据库，则该用户自动继承所有数据库的权限。
+* mongod.lock：这个文件的目的是防止其他mongod的进程使用当前进程的数据。
+* 使用64位的稳定版本的mongodb
+* 
+
+
+# 安装mongodb
 
 * download and extract (linux | windows)
 * su root
 * mkdir -p /data/db
 * chown cmwin:cmwin /data/db
 * export PATH=/home/cmwin/software/mongodb/bin:$PATH
+
 - 启动|关闭方式
 ```
  mongod --dbpath /data/db
@@ -12,23 +34,41 @@
  mongod --shutdown
  mongod --config /etc/mongod/mongod.conf 
  use admin | db.shutdownServer()
+
+ 启动参数：
+  --auth： 是否开启安全检查（用户/密码，权限）
+  --dbpath: 数据文件的存储地址
+  --port:   进程使用的端口
+  --fork:   后台运行进程
+  --logpath：日志文件地址（可读写权限）
+  --logappend:  追加的方式，如果没有该参数，覆盖方式。 
+  --config: 指定配置文件的路径启动进程
+  -f:       指定配置文件的路径启动进程
  
+ 关闭mongodb：
  kill -2 pid
  kill -15 pid
  但不要用kill -9 pid,会导致数据库数据损坏。
-
+ 使用mongodb的命令
+ > use admin
+ > db.shutdownServer();
+ http://localhost:28017
+```
 
 
 ## 常用命令
- mongo
- >version()
- > show dbs
- > use dbname
- > show collections
- > show users
- > db.audit.validate()   -- 检测一个集合状态。
- >db.createCollection("audit", {capped:true, size: 20480})    -创建固定大小集合
- >db.audit.find().sort({$natural: -1}).limit(10)   -- 获取固定集合中的最后10条记录。
+```
+mongo
+>version()
+> show dbs
+> use dbname
+> show collections
+> show users
+> db.audit.validate()   -- 检测一个集合状态。
+>db.createCollection("audit", {capped:true, size: 20480})    -创建固定大小集合
+>db.createCollection("mycollec", {capped:true, size:100000, max:1000}); -- 限制记录条数
+>db.runCommand({convertToCapped: "test", size: 10000})  -- 把普通集合转换未固定集合
+>db.audit.find().sort({$natural: -1}).limit(10)   --获取固定集合中的最后10条记录。
 ```
 
 ## mongo.conf example

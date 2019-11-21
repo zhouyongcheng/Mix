@@ -18,9 +18,10 @@ db.todo.find().forEach(printjson);
 ## 聚集【命令】
 ```
 db.media.count()
-db.media.find({type: 'CD'}).count()   -- 默认情况会忽略limit和skip语句进行统计。
+db.media.count({"type": "cd"})           -- 统计满足条件的记录数
+db.media.find({type: 'CD'}).count()      -- 默认情况会忽略limit和skip语句进行统计。
 db.media.find({type: 'CD'}).count(true)   --不忽略limit和skip语句进行统计。
-db.media.distinct("title");                 -- 返回文档的title数组结果。
+db.media.distinct("title");               -- 返回文档的title数组结果。
 db.media.distinct("product.color")
 db.media.group({
 	key ： {Title: true},
@@ -29,6 +30,12 @@ db.media.group({
 			prev.Total += 13;
 	}
 })
+```
+
+
+## aggregation操作
+```
+
 ```
 
 

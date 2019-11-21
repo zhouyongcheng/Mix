@@ -198,11 +198,67 @@ get http://localhost:9200/sell_out_report_idx_v3/sell_out_report_idx/_search
 }
 
 
- grep '培根鸡腿重磅肉霸堡' /opt/log/wildfly/log-info_20190802.log | grep 'SHA499' 
- 
- 
- EC发送通知请求数据：[storeCode = SHA499
- 
+## 时间直方图例子
+```
+可用的时间间隔表达式： year, month, week,day,hour, quarter,minute,second
+```
+
+http://localhost:9200/sell_out_report_idx/_search
+{
+	"aggs" : {
+		"date_count" : {
+			"date_histogram" : {
+				"field": "outstockTime",
+				"interval": "day",
+				"format": "yyyy-MM-dd"
+			}
+		}
+	}
+}
 
 
+## 时间范围的聚合
+```
+注意事项：时间范围里，包括from的记录，排查to时间的记录。
 
+```
+http://localhost:9200/sell_out_report_idx/_search
+{
+	"aggs" : {
+		"out_range" : {
+			"date_range" : {
+				"field": "outstockTime",
+				"format": "yyyy-MM-dd",
+				"ranges": [
+					{"to": "2019-11-08"},
+					{"from": "2019-11-08"}
+				]
+			}
+		}
+	}
+}
+
+
+## 过滤聚合
+```
+http://localhost:9200/sell_out_report_idx/_search
+{
+	"aggs": {
+		"status_filter": {
+			"filter" : {
+				"term" : {
+					"updateId": "MC20170053"
+				}
+			},
+			"aggs": {
+				"max_out": {
+					"max" : {
+						"field": "outstockTime"
+					}
+				}
+			}
+			
+		}
+	}
+}
+```
