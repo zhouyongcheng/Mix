@@ -16,9 +16,15 @@ nginx -s reload
 
 ```
 
-如何起点nginx
 
-nginx的关闭
+## nginx 起点后报403错误
+```
+修改nginx的配在文件/etc/nginx/nginx.conf
+user nginx 修改为 user root;
+
+查看nginx的启动用户，发现是nobody，而为是用root启动的
+ps aux | grep "nginx: worker process" | awk'{print $1}'
+```
 
 ## windows下查看nginx进程
 tasklist /fi "imagename eq nginx.exe"
