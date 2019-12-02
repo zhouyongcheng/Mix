@@ -1,3 +1,54 @@
+## 理论基础
+复制的作用：
+* 故障切换
+* 数据集成
+* 读扩展
+* 热备份
+* 离线批处理
+
+## 复制方式：
+> 注意内容： 从节点不要超过12个，因为过多的从节点读一个主节点，主节点负荷重。
+* 主从复制
+    备份
+    读扩展
+    故障恢复
+ 架构概要：
+    一主一从
+    一主多从
+ 可选参数：
+    --only  从节点只复制指定的数据库，默认是复制所有的数据库。
+    --slavedelay  延时复制，作为灾备使用，避免致命操作导致数据不可用。
+    --fastsync
+    --autoresync
+    --oplogSize
+
+
+> 构建方式1
+
+```
+mongod --dbpath /data/db/master --port 10000 --master
+mongod --dbpath /data/db/slave1 --port 10001 --slave --source localhost:10000
+```
+
+> 构建方式2
+
+```
+mongod --dbpath /data/db/slave1 --port 10001 --slave
+use local
+db.sources.insert({"host": "localhost:10000"});
+
+如果要改变当前从节点对应的主节点,如果切换的两个主节点有相同的集合，会自动合并。（数据不一定对）
+db.sources.insert({"host": "localhost:20000"});
+db.sources.remove({"host": "localhost:10000"});
+```
+
+
+* 副本集
+   和主从复制最大的区别就是没有固定的主节点。
+   
+
+
+
 部署方案
 1) 高可用：单数据中心
     复制集部署在同一个数据中心的不同机架上。 复制集本身容灾，但数据中心不容错。
@@ -15,3 +66,6 @@
 
 3）高可用：主/主数据中心
   借助第3方数据中心，按普通复制集部署就好了，配置相等数量的复制集成员，第3方数据中心1台。
+
+
+

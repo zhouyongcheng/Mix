@@ -27,6 +27,10 @@
 * chown cmwin:cmwin /data/db
 * export PATH=/home/cmwin/software/mongodb/bin:$PATH
 
+## 在windows中安装为服务
+* 建立数据目录 c:\data\db
+* mongod.exe --dbpath c:\data\db  --install   [mongodb安装为windows的服务]
+
 - 启动|关闭方式
 ```
  mongod --dbpath /data/db
@@ -146,6 +150,8 @@ db.addUser({
 ````
 启动服务器的时候添加 [--auth] 启动选项。
 也可以在启动配置文件(mongodb.cnf)中添加auth=true的配置信息
+--nohttpinter-face  : 关闭掉通过http访问mongodb的方式。28017端口
+--noscripting: 禁止服务器使用script语句，防止脚本攻击。
 ````
 
 ## 给特定的数据库创建用户及授权
@@ -169,6 +175,7 @@ db.addUser({
 - db.auth("admin", "admin");
 - db.system.users.find()
 - db.system.version.find();
+- db.system.users.remove({"user":"test_user"});
 
 ## roles in mongodb
 - read
@@ -201,11 +208,12 @@ rest=true
 `[db.adminCommand({setParameter:1, logLevel:0})]`
 
 
-## 关闭数据库的方式。
-```
-1. use admin, db.shutdownServer()
-2. mongod --shutdown
-```
+## 数据库的备份工作
+* 目录的复制/data/db，在mongodb运行的时候进行备份不安全。
+* mongodump和mongorestore的使用。
+  mongodump可以在运行期间进行备份。会对服务器的性能产生影响（因为是通过查询后备份）
+* xxx
+
 
 ## gridfs管理
 * mongofiles list

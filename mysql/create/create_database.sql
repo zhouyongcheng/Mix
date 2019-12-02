@@ -1,3 +1,6 @@
+-- 创建数据库的名称使用小写字母， 表名也使用小写字母。
+
+
 drop [database | schema] if exists db_name;
 
 
