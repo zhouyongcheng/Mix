@@ -1,3 +1,7 @@
+## 软连接的创建
+ln -s /data/MenuCenter file 
+/data/MenuCenter  -- 已经在本地存在的目录
+file : 要创建的link标识符
 
 ## curl日常使用
 
