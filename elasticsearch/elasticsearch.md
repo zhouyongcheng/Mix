@@ -59,6 +59,39 @@ sudo systemctl start elasticsearch.service
     max.poll.records：
 
 ```
+
+```java
+cluster.name: xx_cluster
+node.name: xx-node-2
+node.master: true
+node.data: true
+#node.attr.rack: r1
+path.data: /var/lib/elasticsearch
+path.logs: /var/log/elasticsearch
+bootstrap.memory_lock: true
+network.host: 0.0.0.0
+http.host: 0.0.0.0
+http.port: 9200
+transport.tcp.port: 9300
+#network.publish_host: 192.168.0.xx
+#network.bind_host: 192.168.0.xx
+discovery.zen.ping.unicast.hosts: ["es1:9300","es2:9300","es3:9300"]
+discovery.zen.minimum_master_nodes: 2
+discovery.zen.commit_timeout: 100s
+discovery.zen.publish_timeout: 100s
+discovery.zen.ping_timeout: 100s
+discovery.zen.fd.ping_timeout: 100s
+discovery.zen.fd.ping_interval: 10s
+discovery.zen.fd.ping_retries: 10
+action.destructive_requires_name: false
+#xpack.security.audit.enabled: false
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+action.auto_create_index: true
+thread_pool.bulk.queue_size: 100 
+bootstrap.system_call_filter: false
+```
+
 * 启动，停止es
 ```
 elasticsearch.sh -d --cluster.name myclusterName --node.name mynode1

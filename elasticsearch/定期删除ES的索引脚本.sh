@@ -1,10 +1,10 @@
 #!/bin/bash
 
 ###################################
-#删除早于3天的ES集群的索引
+#删除早于3天的ES集群的索引，保留3天的索引，则应该是4 day ago
 ###################################
 function delete_indices() {
-    comp_date=`date -d "3 day ago" +"%Y-%m-%d"`
+    comp_date=`date -d "4 day ago" +"%Y-%m-%d"`
     date1="$1 00:00:00"
     date2="$comp_date 00:00:00"
 
