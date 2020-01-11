@@ -6,6 +6,9 @@ db.test.save({})
 ```
 
 ## 查询操作
+> 查询键位的值为null的语句
+db.c.find({"z": {"$in": [null], "$exsits": true}})
+
 
 - 查询并输出内容  
 db.todo.find().forEach(printjson);
@@ -18,9 +21,10 @@ db.todo.find().forEach(printjson);
 ## 聚集【命令】
 ```
 db.media.count()
-db.media.find({type: 'CD'}).count()   -- 默认情况会忽略limit和skip语句进行统计。
+db.media.count({"type": "cd"})           -- 统计满足条件的记录数
+db.media.find({type: 'CD'}).count()      -- 默认情况会忽略limit和skip语句进行统计。
 db.media.find({type: 'CD'}).count(true)   --不忽略limit和skip语句进行统计。
-db.media.distinct("title");                 -- 返回文档的title数组结果。
+db.media.distinct("title");               -- 返回文档的title数组结果。
 db.media.distinct("product.color")
 db.media.group({
 	key ： {Title: true},
@@ -29,6 +33,12 @@ db.media.group({
 			prev.Total += 13;
 	}
 })
+```
+
+
+## aggregation操作
+```
+
 ```
 
 
@@ -57,6 +67,16 @@ db.todo.find({tag: 'java'})
 
 2. 同时包含几个值, tag数组中必须同时有java. db两个值。
 db.todo.find({tag: {$all: ['java','db']}})
+
+3. 精确匹配
+db.todo.find({"tag": ['java', 'db', 'javascript']})
+
+4. 查询指定位置的值
+db.todo.find({"tag.2", "javascript"})
+
+5. 根据数字元素的size查询
+db.todo.find({"tag" : {"$size" : 3}})
+
 db.todo.find({name: 'xxxx'}, {"job": {$slice: [1,2]}} )
 
 db.media.find({release: {$mod: [2,1]}})  -- 获取发现年份为奇数的文档。
@@ -93,7 +113,9 @@ obj:  代表当前的记录
 prev: 当前记录之前记录的统计结果
 initial: 统计的初始值
 ```
-db.media.findOne({title : /xleaning/})
+
+- 正则表达式
+db.media.findOne({"title" : /xleaning/i})  不区分大小写
 
 db.media.findOne({author: 'zhouyc'})
 
@@ -128,3 +150,18 @@ db.todo.drop()  -删除一个集合
 ## capped collection
 - db.createCollection("syslog", {capped:true,size: 1000000, max:200})
 - db.isCapped() 
+
+## mapReduce整理
+map = function() {
+    for (var key in this) {
+        emit(key, {"count" : 1})
+    }
+}
+
+reduce = function(key, emits) {
+    int total = 0;
+    for (var item of emits) {
+        total += emits.count
+    }
+    return {"count": total};
+}

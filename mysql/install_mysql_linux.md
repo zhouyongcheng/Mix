@@ -118,7 +118,6 @@ alter user ‘root’@’localhost’ identified by '123456';
 
 alter user 'root'@'localhost' PASSWORD EXPIRE NEVER;
 flush privileges;
-
-
+cmwin@110!
 
 https://github.com/zhouyongcheng/gitguide.git

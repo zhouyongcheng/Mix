@@ -1,0 +1,27 @@
+ max file descriptors [4096] for elasticsearch process is too low
+#切换到root用户修改
+vim /etc/security/limits.conf
+ 
+ulimit -Hn
+ulimit -Sn
+
+# 在最后面追加下面内容
+*** hard nofile 65536
+*** soft nofile 65536
+
+
+config/elasticseach.yml
+bootstrap.seccomp: false
+
+config/jvm.options
+-Xms1g
+-Xmx1g
+
+
+
+ >vm.max_map_count [65530] is too low
+ sysctl -w vm.max_map_count=262144
+ sysctl -a|grep vm.max_map_count
+
+ 在/etc/sysctl.conf文件最后添加一行
+vm.max_map_count=262144
