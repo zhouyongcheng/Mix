@@ -1,3 +1,10 @@
+## QA
+* kafkas生产者是批量发送消息给broker的，如果这批数据中有一个发生错误，最终是如何处理的。全体失效还是个别失效？
+A：单独针对各个消息进行返回callback调用。因为sender线程负责接收broker返回的消息，并按照消息发送的顺序调用batch中的回调方法。
+* 
+
+
+
 $(Kafka monitor)[https://github.com/quantifind/KafkaOffsetMonitor]
 
 https://thepracticaldeveloper.com/2018/11/24/spring-boot-kafka-config/
@@ -15,6 +22,18 @@ https://thepracticaldeveloper.com/2018/11/24/spring-boot-kafka-config/
 * 异步消息处理，系统间解耦。
 * 消息设计（消息类型）
 * 消息的传递协议
+
+## kafka的消息交付保障
+* producer
+  消息提交到log日志文件后，只要有一个可用的包含该消息的副本，这个消息就不会丢失。
+  新版本的kafka提供了幂等性的producer和事务的支持，避免重复提交消息。
+  幂等性：enable.idempotence=true
+  在broker会存储一个map, key=（producer_id,partition_id), value = 最新的系列号，如果后续发的消息的系列号小于等于当前缓存的系列号，就不会存储。
+
+* consumer
+  consumer的位移提交策略。
+  1） 先获取若干消息，然后提交位移信息，然后消费消息，（最多一次，可能发生丢消息）;
+  2)  获取若干消息，处理完成后，提交位移。 （至少一次，可能重复消费）
 
 ## kafka的消息设计
 kafka消息采用二进制来保存，但仍然是结构化的数据。便于消息引擎进行处理。
@@ -140,11 +159,21 @@ log.retention.bytes=-1
 # 和producer的acks参数配合使用，只要在acks=-1时才有用。 
 min.insync.replicas=2    #表示两个replica收到消息，才显示成功。
 # 确定后台用于网络请求的线程数，默认是3，其他broker和client的请求处理线程。
+# 把请求加入到broker的请求队列的线程数量。
 num.network.threads=3
-# 实际处理网络请求的线程数
+# 实际处理网络请求的线程数,处理消息的线程数（从消息队列中获取消息进行业务处理）
 num.io.threads=8  
 # 最大消息尺寸，超过后就报错，消息丢失。
 message.max.bytes=2M
+# broker维护的唯一请求队列的大小。超过后，新请求就会被阻塞。
+queued.max.requests=500
+# 如果一个follow副本持续的落后leader副本超过10秒，则follow副本被踢出isr.
+replic.lag.time.max.ms=10000ms
+log.segment.bytes=1G   # 控制kafka日志文件单个文件的大小。
+
+
+
+
 ```
 
 * topic参数配置
@@ -219,14 +248,28 @@ zkCli.sh -server localhost:2181
 
 ```
 
+## 管理kafka的集群
+启动broker，启动完成后，记得查看logs/server.log确认状态。
+  首先要启动zookeeper. 使用-daemon， 不要使用在后面加&符号的方式，用户退出后，进程也就退出了。
+  以下是两种可选方案。
+  1）bin/kafka-server-start.sh -daemon config/server.properties
+  2) nohub bin/kafka-server-start.sh config/server.properties &
 
-es.connect.timeout = 1000;    // 连接超时时间
-es.socket.timeout = 30000;    // 连接超时时间
-es.connection.request.timeout = 500; // 获取连接的超时时间
-es.max.connect.num = 100; // 最大连接数
-es.max.connect.per.route = 100; // 最大路由连接数
+关闭broker
+1) 下面的方式会关闭当前机器上的所有kafka实例。
+  bin/kafka-server-stop.sh  
+2） ps ax | grep -i 'kafka\.Kafka' | grep java | grep -v grep | awk '{print $1}'
+   kill -s TERM pid
 
-sudo ufw allow from 10.67.31.186
+## 设置JMX端口
+JMX_PORT=9997 bin/kafka-server-start.sh config/server.properties
+export JMX_PORT=9997 bin/kafka-server-start.sh -daemon config/server.properties
+
+
+## 增加broker
+kafka的集群通过zookeeper来处理，只要在新加入的broker中取个唯一的broker.id就可以了。
+kafka机器能发现新的broker并同步所有的元数据。
+但是新增的broker不会分配任何已经存在的topic分区。用户必须进行手动执行分区分配。对新建的topic没有影响。
 
 # producer的开发（生产者的开发）
 ```
@@ -236,9 +279,116 @@ bootstrap.servers=k1:9092,k2:9092,k3:9092
 # 系列化的类
 key.serializer=xxx
 value.serializer=xxx
-```s
+acks=0   : 不关心消息发送的结果，允许消息丢失，吞吐量大。
+acks=1   ： 消息写入到Leader就会返回成功的通知消息，适中。
+acks=all  ： 消息写入所有的partitions才通知成功。 吞吐量小，安全。
+# producer端用于缓存消息的缓冲区大小，单位是字节。默认是32M
+buffer.memory=33554432
+compression.type=none  #默认没有压缩
+compression.type=GZIP|Snappy|LZ4  # 需要配合服务端的设置进行设置。 减小网络IO。
+# 重试次数的配置，可能造成消息的重复发送，比如网络抖动，消息已经写入kafka,但响应通知未发给producer，会导致重复发送。（精确一次的设计，新版本的kafka解决这个问题？）
+retries=3    #重试次数设置
+retry.backoff.ms=100  #默认为100Ms
+# producer封装多条发往同一个partition的消息到一个batch中，减少网络请求次数。
+batch.size=16384   #默认16K
+batch.size=1048576   #1M
+linger.ms=100   # 批量发送消息的时间间隔
+# 发送请求的大小（指的是一条消息加上消息头的大小？）
+max.request.size=1048576  (默认值)
+# producer发送消息给broker，需要在指定的时间范围内返回处理结果个producer，超过时间，producer就认为请求超时，报timeout异常。
+request.timeout.ms=30000 (30秒)
+```
+
+## producer如何避免数据丢失及乱序的问题。
+无消息丢失的配置策略
+```
+#当缓存区满后，producer处于阻塞状态并停止消息，而不是抛出异常
+block.on.buffer.full=true 
+# 新版本的kafka通过下面的参数进行控制。
+max.block.ms=1000
+acks=all
+# producer只会重试那些可以恢复的异常，错误，不可恢复的是不会重试的。
+retries=Integer.MAX_VALUE
+# 单个broker的连接，能够发送未响应的请求的数量。 producer未收到上个请求的响应，无法发送新的请求。
+max.in.flight.requests.per.connection=1
+
+## broker端的配置
+不允许非ISR的副本被选举为Leader，避免数据丢失。
+unclean.leader.election.enable=false
+replication.factor=3
+min.insync.replicas=2   （只有producer的acks=all或者-1的时候，才有意义）
+推荐配置replication.factor=min.insync.replicas+1
+enable.auto.commit=false
+-- 调用方式
+KafkaProducer.send(record, Callback() {}), 在callback中发送异常时显示关闭producer.
+```
 
 
+## kafka consumer的开发
+```
+auto.offset.reset值含义解释
+earliest 
+当各分区下有已提交的offset时，从提交的offset开始消费；无提交的offset时，从头开始消费 
+latest 
+当各分区下有已提交的offset时，从提交的offset开始消费；无提交的offset时，消费新产生的该分区下的数据 
+none 
+topic各分区都存在已提交的offset时，从offset后开始消费；只要有一个分区不存在已提交的offset，则抛出异常
+
+# 1）consumerGroup检查组内成员发送崩溃的时间设置。
+session.timeout.ms=10000ms (10秒)   #新版本用于确定consumer崩溃的时间
+#2）消息处理逻辑的最大时间。也就是消费者poll出数据后的处理时间大于这个设置的时间，认为这个消费者已经落后其他消费者了，就会被踢出组。该消费者负责的分区被重新分配给其他消费者。理想情况下，会导致rebalance.如果业务处理慢，设置大一点，能完成业务的处理时间。
+max.poll.interval.ms=120000
+# 单次poll获取的消息记录数，如果在单位时间内处理不完，可以设小该参数。
+max.poll.records=50
+# auto.offset.reset=earlist|latest|none
+enable.auto.commit=true|false
+# 如果实际业务的消息很大，设置这个值满足需求。
+fetch.max.bytes=xxxx
+# rebalance的时候，其他成员感知新一轮的rebalce的时间。   
+heartbeat.interval.ms < session.timeout.ms
+heartbeat.interval.ms
+# 用户环境不在乎Socket资源开销，推荐设置为-1，不要关闭空闲连接。
+connections.max.idle.ms=-1
+```
+
+## offset对应消费者的意义
+>最多一次： 消息可能丢失，但不会被重复处理。
+ 消息读取后，在处理之前就提交消息，保障只会被处理一次。 但提交后消息可能处理失败[丢失] 
+
+>最少一次： 消息不会丢失，但可能被处理多次。
+消息消费后提交offset，则保障至少一次。 消息被处理后，提交过程失败，则可能重复消费。
+
+>精确一次： 消息一定会被处理，而且只被处理一次。
+
+
+## rebalance的触发条件
+* 组成员发送变更
+  1）consumer的进程挂掉
+  2）consumer无法在指定的时间内完成消息的处理，则认为consumer挂掉了。
+  调整下面3个参数的配置。避免处理不完导致rebalance的情况。
+  request.timeout.ms
+  max.poll.records
+  max.poll.interval.ms
+
+* 组订阅的topic发送变更
+* 组订阅的topic的分区发送变更
+
+## kafka日志文件的保留策略
+* 基于时间的留存策略 默认会删除7天前的数据，删除log文件，index文件，timeindex文件。
+ log.retention.ms|minutes|hours
+* 基于大小的留存策略
+ log.retention.bytes=-1
+
+ ## 消费者组的管理
+ bin/kafka-consumer-groups.sh --bootstrap-server 10.67.31.48:9092
+ --list
+ --describe
+ --group
+ --zookeeper
+ --reset-offset
+
+> 列出集群中所有的消费者组
+bin/kafka-consumer-groups.sh --bootstrap-server 10.67.31.48:9092 --list
 
 
 

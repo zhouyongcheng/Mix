@@ -3,6 +3,9 @@ ln -s /data/MenuCenter file
 /data/MenuCenter  -- 已经在本地存在的目录
 file : 要创建的link标识符
 
+
+sed -ie 's/192.168.0.1/192.168.0.2/g' /opt/msgct/application-pro.properties
+
 ## curl日常使用
 
 ## 下载文件

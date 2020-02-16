@@ -29,3 +29,6 @@ git rm --cached file_name
 
 # idea tomcat乱码
 Dfile.encoding=UTF-8
+
+
+
