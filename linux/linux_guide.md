@@ -24,6 +24,25 @@ netstat -tunlp
 ## confirm linux versios
 lsb_release -a
 
+<<<<<<< HEAD
+# 查看防火墙状态
+firewall-cmd --state
+
+#停止firewall
+systemctl stop firewalld.service
+
+#禁止firewall开机启动
+systemctl disable firewalld.service 
+
+#关闭selinux 
+vi /etc/selinux/config
+将SELINUX=enforcing改为SELINUX=disabled
+
+ntpdate asia.pool.ntp.org
+
+
+
+=======
 ## add sudo user
 
 
@@ -64,6 +83,9 @@ sudo ufw allow/deny 8080
 sudo ufw allow/deny servicename
 sudo ufw delete allow/deny 20
 ```
+<<<<<<< HEAD
+>>>>>>> a64aeaa7fd16d62e44fe5f78310504597f5f4161
+=======
 
 NFS扩容配置
 检查是否有nfs和rpc
@@ -110,3 +132,4 @@ deb-src http://cn.archive.ubuntu.com/ubuntu/ xenial-backports main restricted un
 deb-src http://cn.archive.ubuntu.com/ubuntu/ xenial-proposed main restricted universe multiverse
 
 sudo apt-get update
+>>>>>>> f5ac529e89a095d78caa355f12def03c9a81b167
