@@ -1,15 +1,48 @@
 # spring oauth2学习笔记
 
+http://localhost:7777/oauth/authorize?response_type=code&client_id=gateway&redirect_uri=http://localhost:8082/callback&scope=all
+
+
+http://localhost:5555/uaa/oauth/authorize?response_type=code&client_id=menuCenter&redirect_uri=http://127.0.0.1:5555/login&scope=all
+
+
+[Spring Security 小知识点](https://blog.csdn.net/xichenguan/article/details/78091567)
+
+[spring-cloud-demo](https://github.com/piomin/sample-spring-microservices-new)
+
+[spring-oauth资源] (https://www.baeldung.com/spring-security-oauth-jwt)
+
+## 安全问题
+```
+1. 对外提供的api访问的安全控制
+2. 做为api的客户端的安全控制
+```
+
 ## 问题点
 ```
 scope是如何进行设定的，如何使用？有什么功能。  
 refresh_token的使用场景
 token持久化的作用什么？为什么要把token存入到数据库或者redis？
 服务器启动的时候,先启动授权服务器,然后在启动资源服务器.
+认证服务器挂了,但已经获取正常token的客户端还是能够通过token访问资源服务器的资源.因为资源服务器能够正常的解析出token,就说明token是经过认证服务器反送的,应该是合法的请求.
+客户端详情信息在数据库中修改后,不用重新启动授权服务器.(修改了认证方式, paaword, authorization_code等,已验证)
+1. 密码模式,必须配置AuthenticationManager,否则认证服务器不支持.
+2. 通过zuul获取token等信息的时候,需要在zuul的配置中添加 zuul.sensitiveHeaders=Cookie,Set-Cookie, 否则报校验通不过的错误信息.
+```
+
+## zuul网关的注意点
+```
+1. 不要随便加@EnableOAuth2Sso, 可能导致正常的路由都失败. Could not get any response的错误.
+2.  如果路由规则中指定的, 如果指定的是SERVICE_ID, 代表的只是服务器地址加上端口号, context-path是不包含的, 如果规则的path和服务的context-path一致,则添加strip-prefix: false
+      mc-oauth-server:
+            path: /uaa/**
+            strip-prefix: false
+            service-id: MC-AUTH-SERVER
 ```
 
 
-
+## spring-oauth表说明 
+[表说明](http://andaily.com/spring-oauth-server/db_table_description.html)
 
 
 ## oauth2的作用
@@ -17,13 +50,239 @@ token持久化的作用什么？为什么要把token存入到数据库或者redi
   > 前提条件： 用户使用的资源系统有相应的授权服务器，并且各个客户端系统有访问客户资源的对接功能。
 
 ## 角色:
-* 配置资源服务器
-* 配置认证服务器
-   提供userDetailService获取用户的详细信息,用于认证.
-   提供token的存储及生成.
-   提供oauth的几种认证方式的实现.
-   提供一个登陆页面,对用户进行验证,通过后发送验证码.
-* 配置spring security
+##  资源服务器
+1. 资源服务器都需要配置哪些内容,都起到什么作用?
+ ```
+ 因为客户端访问资源服务器的时候,都需要携带token进行调用, 如果用非对称加密算法签的token,则只需要获取对应的public-key进行验证,所以配置下面属性
+security:
+    oauth2:
+        resource:
+            id: mc-service-demo
+            prefer-token-info: true
+            jwt:
+                key-uri: http://localhost:7777/uaa/oauth/token_key
+                -- 获取公钥的地址.认证服务器的endpoint.
+
+  也有通过获取用户信息的方式来进行验证的, 未经过测试.todo
+  security:
+    oauth2:
+        resource:
+             id:  mc-service-demo
+             prefer-token-info: false
+             user-info-uri: http://localhost:7777/uaa/user            
+ ```
+
+2. 资源服务器,授权服务器,第3方应用之间的关系是怎么样的?
+2. 资源服务器是不是也要配置成认证服务器的一个客户端?
+3. 资源服务器只间是通过什么样的方式相互访问的?
+4. 第3方应用是如何访问资源服务器的?
+5. 资源服务器上的api是通过授权服务器控制的,还是资源服务器自身控制的?
+    目前的测试结果看, 资源服务器需要定义自己的访问控制策略. 
+    如果资源服务未定义权限控制,只要知道地址,都能访问到,这就需要定义额外的访问策略了(防火墙,网关等)
+6. 如果资源服务器本身不配置资源的权限控制,是可以随便进行访问的.
+7. 资源服务器的访问权限是如何控制的?
+8. 资源服务器如何验证请求中的token的合法性?
+* 认证服务器会暴露url给资源服务器来验证其合法性
+* 提供获取publickey的接口,资源服务器获取public key后用于验证token的合法性.
+
+
+  当资源服务器继承ResourceServerConfigurerAdapter的时候, resourceId就不能在application.properties中进行配置了,需要重写config方法,设置resourceId.
+  ```java
+  @Override
+    public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
+        resources.resourceId("demo").stateless(true);
+    }
+  ```
+
+  9. 资源服务器获取token中配置的额外信息
+  ```java
+  public Map<String, Object> getExtraInfo(Authentication auth) {
+    OAuth2AuthenticationDetails oauthDetails =
+      (OAuth2AuthenticationDetails) auth.getDetails();
+    return (Map<String, Object>) oauthDetails
+      .getDecodedDetails();
+}
+  ```
+
+## 资源服务器之间的相互调用
+
+
+
+
+## 认证服务器
+1. 认证服务器不需要在application.yml文件中配置和oauth相关的内容. (配置Datasource除外,client信息存储用)
+
+2. 如果认证服务器扩展了AuthorizationServerConfigurerAdapter, 就不能在配在文件中配置相应的客户端信息,需要重写configure(ClientDetailsServiceConfigurer clients)方法来提供客户端的相应信息. 采用数据库的方式配置客户端信息.开发可用Memory.
+  ```java
+  @Override
+    public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+        clients.jdbc(dataSource);
+    }
+  ```
+
+3. 因为认证服务器需要认证用户及客户端的有效性, 所以需要配置能获取用户信息及客户端信息的内容
+   * 资源服务器在获取令牌后, 需要进行验证, 从验证服务器上获取publicKey, 这样就能验证token是通过授权服务器颁发的(privatekey签名, publickye验证, 非对称加密), 所以要运行tokenKeyAccess的访问权限.
+   * 资源服务器获取token后, 就可以通过获取的public key验证其有效性.
+```java
+@Override
+public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+        // 允许客户表单认证
+        security.allowFormAuthenticationForClients(); 
+        // 对传入的客户端密码进行加密,然后和数据库中存入的客户端密码进行比较.
+        security.passwordEncoder(passwordEncoder); 
+        // 获取token进行签名的public key及验证token的有效性.
+        security.tokenKeyAccess("permitAll()").checkTokenAccess("isAuthenticated()");
+    }
+```
+4. 验证服务器需要配置token的生成及存储方式
+
+*  提供token的生成及存储方式. 
+*  对token的编码加强,在标准的token信息中添加额外的信息.
+  ```java
+  public class CustomTokenEnhancer implements TokenEnhancer {
+    @Override
+    public OAuth2AccessToken enhance(
+      OAuth2AccessToken accessToken, 
+      OAuth2Authentication authentication) {
+        Map<String, Object> additionalInfo = new HashMap<>();
+        additionalInfo.put(
+          "organization", authentication.getName());
+        ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(
+          additionalInfo);
+        return accessToken;
+    }
+}
+  ```
+ 
+*  token的endpoint的基础信息设置
+   1. 通过tokenEnhancer,在token中添加额外信息,比如用户角色权限信息等.不要放置敏感信息.
+   2. 设在token存储的方式,本例使用的是jwt,这样无需在服务器端进行存储.
+   3. 如果客户端需要支持密码模式的话,必须设置authenticationManager
+   4. 如果需要token更新功能,需要设置userDetailsService.  
+```java
+/**
+  * 授权和令牌端点和令牌服务
+  * @param endpoints
+  */
+@Override
+public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
+    TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
+    tokenEnhancerChain.setTokenEnhancers(Arrays.asList(tokenEnhancer, accessTokenConverter));
+    endpoints.tokenStore(jwtTokenStore)
+            .tokenEnhancer(tokenEnhancerChain)
+            .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST)
+            //refresh_token:UserDetailsService is required
+            .userDetailsService(userDetailService)
+            .authenticationManager(authenticationManager);
+}
+
+ @Bean
+public TokenEnhancer tokenEnhancer() {
+    return new CustomTokenEnhancer();
+}   
+```
+5. 配置认证服务器的WebSecurity信息
+认证服务器本身需要设定自己的安全访问策略. 
+* 获取用户信息的userDetailsService, 能够返回用户的基本信息,密码,角色,权限等信息.
+* PasswordEncoder, 对用户的输入密码进行加密和数据库中保存的密码进行对比.
+* login登陆页面的定制  
+* login成功后的处理
+* login失败后的处理
+* 允许哪些url不用认证就能访问
+* 哪些url必须认证通过后才能访问等
+```java
+@Configuration
+@EnableWebSecurity
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
+    @Autowired
+    private McUserDetailsService userDetailsService;
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+   /**
+     * 获取用户信息的userDetailsService, 能够返回用户的基本信息,密码,角色,权限等信息.
+     * PasswordEncoder, 对用户的输入密码进行加密和数据库中保存的密码进行对比.
+     */
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+    }
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+            .csrf().disable()
+            .exceptionHandling()
+            .authenticationEntryPoint((request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED))
+            .and()
+            .authorizeRequests()
+            .antMatchers("/login", "/login.html","/oauth/token").permitAll()
+            .anyRequest().authenticated()
+            .and()
+            .httpBasic();
+    }
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/**/*.css");
+        web.ignoring().antMatchers("/**/*.js");
+        web.ignoring().antMatchers("/favor.ioc");
+        web.ignoring().antMatchers("/resources/**");
+    }
+}
+```
+
+## 非对称加密的方式签发token
+```text
+1. 生成keystore文件: mytest.jks
+keytool -genkeypair -alias mytest 
+                    -keyalg RSA 
+                    -keypass mypass 
+                    -keystore mytest.jks 
+                    -storepass mypass
+
+2. 导出public key
+keytool -list -rfc --keystore mytest.jks | openssl x509 -inform pem -pubkey
+
+-----BEGIN PUBLIC KEY-----
+yyyyy
+-----END PUBLIC KEY-----
+
+-----BEGIN CERTIFICATE-----
+xxxxx
+-----END CERTIFICATE-----
+
+ 只获取public key的方式.
+keytool -list -rfc --keystore mytest.jks | openssl x509 -inform pem -pubkey -noout  
+3. 拷贝public部分的内容放到资源服务器的resource/public.txt, 以文件的方式存放.
+```
+
+## 在授权服务器上配置token使用的非对称key,z主要就是修改JwtAccessTokenConverter
+```java
+@Bean
+public JwtAccessTokenConverter accessTokenConverter() {
+    JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
+    KeyStoreKeyFactory keyStoreKeyFactory = 
+      new KeyStoreKeyFactory(new ClassPathResource("mytest.jks"), "mypass".toCharArray());
+    converter.setKeyPair(keyStoreKeyFactory.getKeyPair("mytest"));
+    return converter;
+}
+```
+
+
+
+6. 自定义认证服务器的登陆页面
+    
+7. 客户端使用用户名密码进行登陆
 
 
 
@@ -37,6 +296,18 @@ token持久化的作用什么？为什么要把token存入到数据库或者redi
 * resource server：资源服务器存放受保护资源，要访问这些资源，需要获得访问令牌。
 * client：客户端代表请求资源服务器资源的第三方程序
 * authrization server：授权服务器用于发放访问令牌给客户端
+```
+1. ClientDetailsServiceConfigurer：用来配置客户端详情信息
+2. AuthorizationServerSecurityConfigurer：用来配置令牌端点(Token Endpoint)的安全与权限访问。
+* /oauth/authorize(授权端，授权码模式使用)
+* /oauth/token(令牌端，获取 token)
+* /oauth/check_token(资源服务器用来校验token)
+* /oauth/confirm_access(用户发送确认授权)
+* /oauth/error(认证失败)
+* /oauth/token_key(如果使用JWT，可以获的公钥用于 token 的验签
+3. AuthorizationServerEndpointsConfigurer：用来配置授权以及令牌（Token）的访问端点和令牌服务（比如：配置令牌的签名与存储方式）
+```
+
 
 **参考资料**
 [OAuth工作流程](https://www.jianshu.com/p/68f22f9a00ee)

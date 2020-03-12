@@ -184,9 +184,9 @@ db.addUser({
 ## roles in mongodb
 - read                                 :用户可读取指定的数据库
 - readWrite                        :用户对指定的数据库有读写权限
-- dbAdmin                            :在指定的数据库中个执行管理操作
-- userAdmin
-- clusterAdmin
+- dbAdmin                            :在指定的数据库中个执行管理操作,创建,删除索引等.
+- userAdmin                        : 对system.users中有创建,删除,更新权限.
+- clusterAdmin                  : 只在admin数据库中可用.
 - readAnyDatabase
 - readWriteAnyDatabase
 - userAdminAnyDatabase

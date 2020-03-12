@@ -1,3 +1,20 @@
+## centos修改hostname
+```
+1. centos6:编辑以下两个文件
+/etc/hosts
+/etc/sysconf/network
+
+2. centos7:
+hostnamectl --static set-hostname name
+```
+
+## ssh免密登陆
+```
+1. ssh-keygen -t rsa
+2. ssh-copy-id -i ~/.ssh/id_rsa.pub username@nodename
+```
+
+
 
 ## curl日常使用
 
@@ -14,17 +31,16 @@ netstat -tunlp
 
 ````
 
-## confirm linux versios
+## 查看linux的版本信息
 lsb_release -a
 
-## add sudo user
+## centos添加sudo用户
+```
+1. root用户登陆
+2. visudo 
+3. 复制root用户的行,把root用户改为自己的用户就ok
+```
 
-
-curl -s clientId:secretId@localhost:4001/oauth/token  \
- -d grant_type=client_credentials \
- -d scope=app
-
-## install git on linux 
 
 
 # ubuntu network setting

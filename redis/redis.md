@@ -2,6 +2,8 @@
 # reference document
 [redis-guide](https://redis.io/topics/quickstart)
 
+[redis常用命令] (https://www.cnblogs.com/jtfr/p/10503803.html)
+
 # install redis
 ```
 wget -C http://download.redis.io/redis-stable.tar.gz
@@ -13,7 +15,7 @@ make install
 
 src/redis-server
 src/redis-cli
-src/redis-cli shutdown NOSAVEc
+src/redis-cli shutdown NOSAVE
 ```
 
 # admin command
