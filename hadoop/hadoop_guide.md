@@ -4,7 +4,12 @@
 * 伪分布式模式
 * 完全分布式模式
 
-## ssh免密登陆
+## ssh localhost免密登录
+```
+ssh-keygen -t rsa
+cp ~/.ssh/id_rsa.pub ~/.ssh/authorized_keys
+chmod 0600 ~/.ssh/authorized_keys 
+```
 
 ## zookeeper的集群安装
 ```
@@ -30,3 +35,27 @@ node23:/data/soft/zookeeper
 6. 注意防火墙可能导致节点间不通导致访问失败.
    > WatchedEvent state:SyncConnected type:None path:null 表示连接成功.   
 ```
+
+## install hadoop
+下载hadoop的压缩包，解压到/usr/local/hadoop.
+chown -R hadoop:hadoop /usr/local/hadoop
+
+
+# Hadoop HDFS操作
+* 格式化配置HDFS文件系统
+> hadoop namenode -format
+* 启动分布式文件系统
+> start-dfs.sh
+> stop-dfs.sh
+* HDFS的文件列表
+> $HADOOP_HOME/bin/hadoop fs -ls <args>
+* 将数据插入到HDFS
+```
+    $HADOOP_HOME/bin/hadoop fs -mkdir /user/input 
+    $HADOOP_HOME/bin/hadoop fs -put /home/file.txt /user/input
+    $HADOOP_HOME/bin/hadoop fs -ls /user/input
+    $HADOOP_HOME/bin/hadoop fs -cat /user/output/outfile 
+    从HDFS得到文件使用get命令在本地文件系统。
+    $HADOOP_HOME/bin/hadoop fs -get /user/output/ /home/hadoop_tp/ 
+```
+

@@ -114,9 +114,10 @@ cp support-files/mysql.server /etc/init.d/
 ------------------------------------
 bin/mysql -uroot -pxxxxx   (/data01/mysql/log/mysql.err temp password)
 
-alter user ‘root’@’localhost’ identified by 'cmwin@110!';
+alter user ‘root’@’localhost’ identified by '123456';
 
 alter user 'root'@'localhost' PASSWORD EXPIRE NEVER;
 flush privileges;
 cmwin@110!
 
+https://github.com/zhouyongcheng/gitguide.git

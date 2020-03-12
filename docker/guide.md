@@ -7,14 +7,38 @@
 ## EurekaConsumer: 9002
 
 
+## 移除旧的版本：
+```
+[install docker](http://www.runoob.com/docker/centos-docker-install.html)
+sudo yum remove docker \`
+                docker-client \
+                docker-client-latest \
+                docker-common \
+                docker-latest \
+                docker-latest-logrotate \
+                docker-logrotate \
+                docker-selinux \
+                docker-engine-selinux \
+                docker-engine
+```
+
+## 安装一些必要的系统工具：
+```
+sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+添加软件源信息：
+sudo yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+更新 yum 缓存：
+sudo yum makecache fast
+sudo yum -y install docker-ce
+sudo systemctl start docker
+```
+
+
 ## docker的安装(centos)
 ````
+确保 yum 包更新到最新。
 yum -y update
 wget -qO- https://get.docker.com/ | sh
-yum -y install docker-registry
-````
-
-````
 yum -y install docker docker-registry
 systemctl enable docker.service
 systemctl start docker.service
@@ -158,6 +182,7 @@ docker rm -v dbdata
 docker run -d -p 4001:4001 --name spring-boot-rest spring-boot-image
 查看容器绑定的端口
 docker port container_nm
+docker port container_nm 5000
 容器间相互通信(web容器和db容器通信)
 docker run -d --name db mydb-image
 docker run -td --link db:db --name myweb spring-boot-img 

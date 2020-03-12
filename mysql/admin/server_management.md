@@ -120,12 +120,14 @@ create database if not exists db_name default character set = utf8  collate = xx
 
 #创建用户(可以从任何一台机器链接访问，只能从指定的服务进行进行链接。)
 create user cmwin identified by '123456';    
-create user cmwin@'192.168.0.1' identified by '123456';
+create user cmwin@'192.168.3.23' identified by 'cmwin@110!';
 
 #创建用户并授权
 grant select on myschema.* to cmwin identified by '123456';
 grant select on myschema.* to cmwin@192.168.0.2 identified by '123456';
 grant select on mysql.user to cmwin@192.168.0.2;
+
+GRANT ALL PRIVILEGES ON cmwin.* TO 'root'@'%' IDENTIFIED BY 'cmwin@110!' WITH GRANT OPTION;
 
 #查看用户的授权
 show grants for 'cmwin'@'192.168.0.2';

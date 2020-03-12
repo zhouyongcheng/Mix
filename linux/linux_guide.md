@@ -14,7 +14,13 @@ hostnamectl --static set-hostname name
 2. ssh-copy-id -i ~/.ssh/id_rsa.pub username@nodename
 ```
 
+## 软连接的创建
+ln -s /data/MenuCenter file 
+/data/MenuCenter  -- 已经在本地存在的目录
+file : 要创建的link标识符
 
+
+sed -ie 's/192.168.0.1/192.168.0.2/g' /opt/msgct/application-pro.properties
 
 ## curl日常使用
 
@@ -41,6 +47,23 @@ lsb_release -a
 3. 复制root用户的行,把root用户改为自己的用户就ok
 ```
 
+# 查看防火墙状态
+firewall-cmd --state
+
+#停止firewall
+systemctl stop firewalld.service
+
+#禁止firewall开机启动
+systemctl disable firewalld.service 
+
+#关闭selinux 
+vi /etc/selinux/config
+将SELINUX=enforcing改为SELINUX=disabled
+
+ntpdate asia.pool.ntp.org
+
+
+## add sudo user
 
 
 # ubuntu network setting
@@ -96,26 +119,5 @@ df -h
 检查
 showmount -e 172.20.193.33
 
-
 mount -t nfs 172.25.216.21:/data /data
 
-修改/etc/hosts,并立刻生效
-=======
-change ubuntu repository
-=---------------------
-sudo apt-get clean
-sudo rm /var/lib/apt/lists/* -vf
-将/etc/apt/sources.list文件替换为下面文件
-
-deb http://cn.archive.ubuntu.com/ubuntu/ xenial main restricted universe multiverse
-deb http://cn.archive.ubuntu.com/ubuntu/ xenial-security main restricted universe multiverse
-deb http://cn.archive.ubuntu.com/ubuntu/ xenial-updates main restricted universe multiverse
-deb http://cn.archive.ubuntu.com/ubuntu/ xenial-backports main restricted universe multiverse ##测试版源
-deb http://cn.archive.ubuntu.com/ubuntu/ xenial-proposed main restricted universe multiverse # 源码
-deb-src http://cn.archive.ubuntu.com/ubuntu/ xenial main restricted universe multiverse
-deb-src http://cn.archive.ubuntu.com/ubuntu/ xenial-security main restricted universe multiverse
-deb-src http://cn.archive.ubuntu.com/ubuntu/ xenial-updates main restricted universe multiverse
-deb-src http://cn.archive.ubuntu.com/ubuntu/ xenial-backports main restricted universe multiverse ##测试版源
-deb-src http://cn.archive.ubuntu.com/ubuntu/ xenial-proposed main restricted universe multiverse
-
-sudo apt-get update

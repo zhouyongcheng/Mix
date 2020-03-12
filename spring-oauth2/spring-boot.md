@@ -101,3 +101,16 @@ Feign 具有如下特性：
     可以使用 fallback 方法返回的值。fallback 方法的返回值一般是设置的默认值或者来自缓存。
     熔断只是作用在服务调用这一端
     ```
+https://www.
+.com/u/f1c47972d390
+
+## 导入xml定义的bean
+```java
+@ImportResource(value = "{classpath:spring_ftp.xml}")
+public class AppConfig {
+
+    @Value("${http.url:http://localhost:8080}")   // 参数值和默认值的配置方式
+    private String url;
+}
+```
+
