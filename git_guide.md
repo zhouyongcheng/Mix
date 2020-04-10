@@ -1,4 +1,26 @@
+## svn 导出纯代码
+1. 拷贝svn的项目,放在一个干净的目录下面.
+2. 执行下面的清理脚步,完成svn信息的清除.
+```bat
+ @echo On
+ @Rem 删除SVN版本控制目录
+ @PROMPT [Com]
+
+ @for /r . %%a in (.) do @if exist "%%a/.svn" rd /s /q "%%a/.svn"
+ @Rem for /r . %%a in (.) do @if exist "%%a/.svn" @echo "%%a/.svn"
+  
+ @echo Mission Completed.
+ @pause
+```
+
+
+## 把本地文件导入到maven仓库,避免从远程仓库导入
+```
+mvn install:install-file -Dfile=~/ftp4j-1.6.jar -DgroupId=it.sauronsoftware -DartifactId=ftp4j -Dversion=1.6 -Dpackaging=jar
+```
+
 # common command
+
 当执行 "git reset HEAD" 命令时，暂存区的目录树会被重写，被 master 分支指向的目录树所替换，但是工作区不受影响。
 当执行 "git rm --cached <file>" 命令时，会直接从暂存区删除文件，工作区则不做出改变。
 
@@ -128,4 +150,4 @@ git push origin :refs/tags/v0.9
 threadpool.bulk.type: fixed
 threadpool.bulk.size: 8
 threadpool.bulk.queue_size: 1000
->>>>>>> f5ac529e89a095d78caa355f12def03c9a81b167
+

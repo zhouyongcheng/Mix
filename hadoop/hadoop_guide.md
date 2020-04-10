@@ -40,6 +40,10 @@ node23:/data/soft/zookeeper
 > 注意：每个节点的安装和配置是相同的，通常在master中配置完成后，把安装目录复制到其他节点。特别注意的是，使用普通用户，非root用户。
 > 如果是生产环境，考虑单独创建个用户和用户组来负责hadoop的相关安装和配置。
 
+# 访问地址
+hdfs webui 界面: http://192.168.101.3:9870
+yarn webui 界面: http://192.168.101.3:8088
+
 * hadoop版本的选择，实验环境选择hadoop-3.2.1
 * 解压安装到/data/soft/hadoop-3.2.1  
 * 配置环境变量HADOOP_HOME
@@ -92,3 +96,32 @@ node23:/data/soft/zookeeper
     $HADOOP_HOME/bin/hadoop fs -get /user/output/ /home/hadoop_tp/ 
 ```
 
+<configuration>
+    <property>
+        <name>yarn.nodemanager.aux-services</name>
+        <value>mapreduce_shuffle</value>
+    </property>
+<property>
+<name>yarn.nodemanager.env-whitelist</name>
+<value>JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CL
+ASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_MAPRED_HOME</value>
+</property>
+<property>
+<name>yarn.resourcemanager.hostname</name>
+<value>hadoop100</value>
+</property>
+<configuration>
+
+
+HDFS_DATANODE_USER=cmwin
+HDFS_DATANODE_SECURE_USER=hdfs
+HDFS_NAMENODE_USER=cmwin
+HDFS_SECONDARYNAMENODE_USER=cmwin
+
+
+YARN_RESOURCEMANAGER_USER=cmwin
+HADOOP_SECURE_DN_USER=yarn
+YARN_NODEMANAGER_USER=cmwin
+
+## 删除指定目录
+./hdfs dfs -rm -f -R /mysql

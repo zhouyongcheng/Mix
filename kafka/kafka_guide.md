@@ -67,10 +67,12 @@ kafka消息采用二进制来保存，但仍然是结构化的数据。便于消
 ```
    在启动kafka之前，先要启动zookeeper， 压缩包中已经内置了zookeeper.可直接启动。
    在KAFKA_HOME目录下执行下面命令：
+   本地单例起到zookeeper和kafka
    bin/zookeeper-server-start.sh config/zookeeper.prperties
-   bin/kafka-server-start.sh  -daemon /home/cmwin/software/kafka/config/server.properties
+   bin/kafka-server-start.sh  -daemon /data/soft/kafka/config/server.properties
 ```
 
+# kafka常用命令
 ## 创建topic
 ```
 bin/kafka-topics.sh --create --zookeeper localhost:2181 --topic test --replication-factor 1 --partitions 1 

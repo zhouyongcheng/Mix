@@ -1,3 +1,21 @@
+## linux下设置capsLock为ESC
+1.vim ~/.xmodmaprc 
+
+2.添加如下内容
+```
+remove Lock = Caps_Lock
+add Lock = Escape 
+keysym Caps_Lock = Escape
+keysym Escape = Caps_Lock
+```
+3.执行 xmodmap .xmodmaprc 使之生效。
+
+## 常用设置
+1. set hls     (高亮显示查询的内容)
+2. set incsearch
+3. clipboard+=unnamed
+4. 中文
+
 ## vim的查找替换vi/vim 中可以使用 :s 命令来替换字符串
 ```bash
 :s/vivian/sky/ 替换当前行第一个 vivian 为 sky
@@ -287,4 +305,18 @@ $: 最后一行
 {m,n}: 表示m到n个字符。这要和 \s与\a等连用，如 \a\{m,n} 表示m 到n个英文字母。
 {m,}: 表示m到无限多个字符。
 **: 当前目录下的所有子目录。
+```
+
+## 编辑模式下的快捷键
+```
+ctrl+h : 删除一个字符
+ctrl+w : 删除一个词
+ctrl+u : 删除一个句子
+```
+##命令行下的技巧,上面的几个快捷方式也适用.
+```
+ctrl + a  : 命令行头
+ctrl + e  : 命令行尾
+ctrl + b  : 后退
+ctrl + f  : 前移
 ```

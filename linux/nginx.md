@@ -1,6 +1,12 @@
 # nginx配置
 /etc/nginx/..
 
+## 查看nginx的模块信息
+```
+2>&1 nginx -V | tr ' ' '\n' | grep stream
+```
+
+
 ## nginx 常用命令
 ```
 运行nginx

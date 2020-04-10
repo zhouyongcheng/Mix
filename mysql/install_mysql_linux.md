@@ -1,6 +1,13 @@
 # 用二进制包安装mysql
 > download mysql  mysql-8.0.12-linux-glibc2.12-x86_64.tar.xz
 
+## 错误解决
+```
+ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/var/lib/mysql/mysql.sock' (2)
+
+在/etc/my.cnf文件的[client]和[mysqld]节点下配置socket=/var/lib/mysql/mysql.sock
+```
+
 ## copy my.cnf /etc/my.cnf
 --------------------------------
 * linux的默认查找优先级
