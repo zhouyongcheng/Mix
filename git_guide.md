@@ -81,8 +81,6 @@ git remote add origin git@github.com:michaelliao/learngit.git
 git push -u origin master
 -- 只推送
 git push origin master
-<<<<<<< HEAD
-=======
 
 -- 如果从零开始开发，先建立远程仓库，然后在本地进行clone。
 
@@ -142,6 +140,12 @@ git tag -d v0.9
 git push origin :refs/tags/v0.9
 ```
 
+## git 导出纯代码
+```
+git archive --format zip --output "../master.zip" master -0
+git archive --format zip --output "../output.zip" master -0
+```
+
 
  git clone git@10.67.31.48:/home/git/mcrepo.git
   git clone git@10.67.31.48:/home/git/msgcenter.git
@@ -151,3 +155,4 @@ threadpool.bulk.type: fixed
 threadpool.bulk.size: 8
 threadpool.bulk.queue_size: 1000
 
+git remote add origin git@192.168.101.14:/home/git/gitrepo/mcproj.git

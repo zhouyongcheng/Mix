@@ -11,17 +11,30 @@ https://thepracticaldeveloper.com/2018/11/24/spring-boot-kafka-config/
 
 (spring-boot|kafka)[https://blog.csdn.net/cowbin2012/article/details/85407495]
 
+## kafka的监控软件
+
+1. (kafka eagle)[http://download.smartloli.org/]
+
+2. kafka manager
+
+   ## topic的创建
+
+1. 设定topic的partition数， partition是分散到各个broker上。
+2. 设定partition的副本数，各个副本也存储在各个broker上，数据冗余。可靠性。
+3. 每个partition都会一个leader的broker，其他副本的broker叫做flower. 写操作只会针对leader partition。
+4. 如果要保障整个topic的顺序性，则一个topic创建一个partition来保障。丢失并发能力。
+5. 生产环境中，topic的partition数<=broker的个数。
+
 # 为什么要选择kafka？
 * 高性能的消息发送及消息消费。
 * 高吞吐率（超大量级的数据实时传输），每秒能处理的消息数（数据量）
 * 实时性（低延时），客户端发送消息到客户端消费消息的时间。 高吞吐低延时。
-* 消息的可靠性策略（消息丢失及重复消费的避免）
-* 消息的持久化功能
-* 扩展性（横向扩展能力，可操作性），负载均衡和故障转移。
-* 实时流式处理
-* 异步消息处理，系统间解耦。
-* 消息设计（消息类型）
-* 消息的传递协议
+* 消息容错性，可靠性策略（消息丢失及重复消费的避免）。
+* 消息的持久化功能, 顺序的写入，零拷贝（内核完成），分布式并发读写，性能高。（消息保存到硬盘，默认7天）
+* 热扩展性（分布式的，横向扩展能力，可操作性），负载均衡和故障转移。
+* 秒杀的流量消峰处理。
+* 异步消息处理，系统间解耦。提高整个系统的可靠性。
+* 动态的上下线。集群自动维护数据的可用性（rebalance）
 
 ## kafka的消息交付保障
 * producer
@@ -101,7 +114,7 @@ bin/kafka-console-consumer.sh --bootstrap-server 10.67.31.48:9092 --topic mytopi
 ```sh
 bin/kafka-topics.sh --zookeeper localhost:2181 --alter --topic tp_product_sell_out_notification --partitions 9
 ```
- 
+
 ## 删除topic及相关数据
 ```
 bin/kafka-topics.sh  --delete --zookeeper 172.25.216.29：2182,172.25.216.30：2182 --topic tp_product_sell_out_notification
@@ -247,6 +260,7 @@ zkCli.sh -server localhost:2181
 # zookeeper集群安装
 ```
 * 在集群中的每个机器都解压zookeeper，然后配置，每个机器上的zoo.cfg文件都一样，配置好一个，复制就行。
+* 使用同一组zookeeper的kafka构成同一组kafka集群。
 
 ```
 
@@ -273,7 +287,16 @@ kafka的集群通过zookeeper来处理，只要在新加入的broker中取个唯
 kafka机器能发现新的broker并同步所有的元数据。
 但是新增的broker不会分配任何已经存在的topic分区。用户必须进行手动执行分区分配。对新建的topic没有影响。
 
-# producer的开发（生产者的开发）
+## 生产者
+
+##    生产者消息的重复发送
+
+1. 当写入kafka的topic的leader节点和flower节点后，给生产者客户端发送ACK消息失败后，生产者收不到ack消息，就会重新发送消息，导致消息的重复发送。
+2. kafka事务的概念是针对生产者的，当生产者批量发送消息的时候，可能分发到各个partition， 分发过程中，生产者挂掉后，就可能出现数据的不一致性（30条数据，有20条写入partition成功，有10条失败的情况），事务的ID是客户端的生产者提供的。
+3. 生产者在发送消息的时候，主线程是一个一个的发，但是客户端的后台发送线程是先组织好一批消息后一次发送，减少网络通信的评率，提高生产者的效率。（通过时间阀值和数量阀值来控制什么时候发送。
+
+
+
 ```
 配置信息
 # 如果集群中机器很多，只需配置几个，会自动搜索其他的broker。 配置多个，避免单点问题。 如果配置listeners没有明确配置ip地址，则用hostname，而不是ip地址。
@@ -325,8 +348,62 @@ enable.auto.commit=false
 KafkaProducer.send(record, Callback() {}), 在callback中发送异常时显示关闭producer.
 ```
 
+### 生产者API
 
-## kafka consumer的开发
+1. 生产者发送消息是异步的方式，客户端程序中写的代码部分是同步方式，但在通过api的send方法发送后，会产生一个后台线程进行发送消息，就构成了异步发送的过程。（有客户端API来实现）。
+2. 生产者对ack信息的处理， 如果接收到ack，则更加ack判断正常，异常进行处理。如果未收到，怎么处理？重试？（可能出现重复发送的问题，解决这个问题，是否需要在消费者端协调处理，避免重复数据的重复消费？）
+3. 主线程(main)和send线程共同完成消息发送。中间通过RecordAccumulator来协调。
+4. 拦截器，系列化和分区都是在生产者端指定的。
+
+
+
+## 消费者
+
+1. 各种消费者组的消费一致性（高水位机制）
+2. 不能保障消息的丢失。
+3. 消费者组中的消费者个数发生变化时，会对消费的partition信息进程重新分配。
+4. 消费的偏移量是以[组，topic, partition] 为单位记录的。当一个partition重新分配给组内的另外一个消费       者后，不会产生消息的重复消费的问题。
+5. 高水位的概念：针对的是同一个partition中的leader和follower节点的内容，消费者只能消费在高水位以前的数据，避免leader重选后，获取不到数据。水位线取在isr中的各个broker中LEO(log end offset)最小的为水位线。 消费者消费数据的一致性。可能会出现数据丢失和数据重复的问题。 就是flower没完全同步过来，但leader挂掉，新选举的leader的数据就会少了。新写入到leader，以前leader没有同步过来的消息就丢失了。新选举出来的leader会发出各个flower截取到新的水位线的数据（丢弃高于水位线的消息丢失）【储存一致性，消费一致性】。
+6. 消费者的位移信息是保存在zk或者kafka中，有启动kafka消费者的参数决定。--zookeeper 或者 --bootstrap-server区分。
+
+数据重复： 当leader挂掉后，各个flower会同步部分数据，产生新的水位线。 生产者未收到leader的ack信息，重新发送消息，就会导致在前一个水位线和当前水位线的数据产生重复。
+
+消费者消费partition的分区策略
+
+1）roundRobin
+
+2）Range： 可能出现消费的消息partion不对等的情况，一个消费者消费比较多的partition的，另一个消费少的partition。常出现在一个消费者组消费多个topic的情况。
+
+
+
+### 消费者自动提交(offset)
+
+消费者提交offset成功后，如果消费者挂掉，则同一组的不同消费者来进行消费，如果是earlier模式，则会从提交点后的offset开始消费，避免消息的丢失。如果是last模式，则会丢掉保存的offset后及当前到来消息前的消息。offset偏移量的保存[group:topic:partition=offset]
+
+消费者自动提交会出现数据丢失的问题， 比如自动提交的时间是100毫秒，那么当消费者获取一笔数据进行处理，在100毫秒内不能正常的处理完，这时，自动就提交offset到zookeeper或者_consumer_offset里， 后面消费者处理失败了，则会发生处理失败记录的丢失。
+
+先提交后处理，会出现数据丢失的情况。
+
+先处理消息后提交offset，则会出现重复消费的情况。 比如消费一批消息写入mysql， 但在提交的时候失败。则下次消费的时候就出现相同消息重复写入mysql的情况。
+
+### 消费者手动提交
+
+1. 配置enable.auto.commit = false   
+2. 同步手动提交
+3. 异步手动提交
+
+### 消费者自定义存储offset的方式
+
+默认情况下，offset可以存着zookeeper中或者kafka本身的_consumer_offset主题中。
+
+自定义的话，可以考虑把业务处理的逻辑和提交offset的逻辑放在一个支持事务处理的逻辑中。这样就能保障其事务一致性。比如mysql等。
+
+幂等性：
+
+生产者的幂等性： enable.idompotence=true
+
+
+
 ```
 auto.offset.reset值含义解释
 earliest 

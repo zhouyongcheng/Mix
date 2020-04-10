@@ -15,6 +15,10 @@ keysym Escape = Caps_Lock
 2. set incsearch
 3. clipboard+=unnamed
 4. 中文
+##
+```
+set clipboard+=unnamed
+```
 
 ## vim的查找替换vi/vim 中可以使用 :s 命令来替换字符串
 ```bash

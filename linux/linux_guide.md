@@ -16,12 +16,33 @@ cat /proc/cpuinfo| grep "processor"| wc -l
 # 查看CPU信息（型号）
 cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c
 ```
+<<<<<<< Updated upstream
+## 问题点
+1） tmpfs: Bad mount option huge
+2) intel corporation hd graphics 620 rev 02  (显卡)
+
+centos7 默认从KDE启动
+```
+# yum -y groupinstall "Graphical Administration Tools"
+# yum -y groupinstall "Internet Browser"
+# yum -y groupinstall "General Purpose Desktop"
+# yum -y groupinstall "Office Suite and Productivity"
+# yum -y groupinstall "Graphics Creation Tools"
+```
+echo "gnome-session" >> ~/.xinitrc
+echo "exec startkde" >> ~/.xinitrc
 
 ## centos修改hostname
 ```
 1. centos6:编辑以下两个文件
 /etc/hosts
+192.168.101.21  node21
+192.168.101.22  node22
+192.168.101.23  node23
+
 /etc/sysconf/network
+NETWORKING=yes
+HOSTNAME=node21
 
 2. centos7:
 hostnamectl --static set-hostname name
