@@ -16,7 +16,6 @@ cat /proc/cpuinfo| grep "processor"| wc -l
 # 查看CPU信息（型号）
 cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c
 ```
-<<<<<<< Updated upstream
 ## 问题点
 1） tmpfs: Bad mount option huge
 2) intel corporation hd graphics 620 rev 02  (显卡)
