@@ -36,10 +36,43 @@ node23:/data/soft/zookeeper
    > WatchedEvent state:SyncConnected type:None path:null 表示连接成功.   
 ```
 
-## install hadoop
-下载hadoop的压缩包，解压到/usr/local/hadoop.
-chown -R hadoop:hadoop /usr/local/hadoop
+## hadoop的安装
+> 注意：每个节点的安装和配置是相同的，通常在master中配置完成后，把安装目录复制到其他节点。特别注意的是，使用普通用户，非root用户。
+> 如果是生产环境，考虑单独创建个用户和用户组来负责hadoop的相关安装和配置。
 
+* hadoop版本的选择，实验环境选择hadoop-3.2.1
+* 解压安装到/data/soft/hadoop-3.2.1  
+* 配置环境变量HADOOP_HOME
+* 配置$HADOOP_HOME/etc/hadoop/hadoop-env.sh, 修改JAVA_HOME的地址
+* 配置yarn环境信息$HADOOP_HOME/etc/hadoop/yarn_env.sh,修改JAVA_HOME的地址.
+
+## 配置核心文件
+* core-site.xml
+```
+<property>
+    <name>fs.defaultFS</name>
+    <value>hdfs://master:9000</value>
+</property>
+<property>
+    <name>hadoop.tmp.dir</name>
+    <value>/data/hadoop/tmp</value>
+</property>
+```
+* hdfs-site.xml
+```
+# HDFS的最大副本数就是3,超过3也是没有意义的。
+<property>
+    <name>dfs.replication</name>
+    <value>l</value >
+</property>
+```
+* yarn-site.xml
+```
+
+```
+
+* x
+* 
 
 # Hadoop HDFS操作
 * 格式化配置HDFS文件系统
