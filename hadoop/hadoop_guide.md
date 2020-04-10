@@ -36,9 +36,15 @@ node23:/data/soft/zookeeper
    > WatchedEvent state:SyncConnected type:None path:null 表示连接成功.   
 ```
 
+<<<<<<< Updated upstream
 ## hadoop的安装
 > 注意：每个节点的安装和配置是相同的，通常在master中配置完成后，把安装目录复制到其他节点。特别注意的是，使用普通用户，非root用户。
 > 如果是生产环境，考虑单独创建个用户和用户组来负责hadoop的相关安装和配置。
+=======
+# 访问地址
+hdfs webui 界面: http://192.168.101.3:9870
+yarn webui 界面: http://192.168.101.3:8088
+>>>>>>> Stashed changes
 
 # 访问地址
 hdfs webui 界面: http://192.168.101.3:9870
@@ -113,6 +119,7 @@ ASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_MAPRED_HOME</value>
 <configuration>
 
 
+HDFS_DATANODE_USER=cmwin
 HDFS_DATANODE_USER=cmwin
 HDFS_DATANODE_SECURE_USER=hdfs
 HDFS_NAMENODE_USER=cmwin
