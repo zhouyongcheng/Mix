@@ -1,4 +1,40 @@
+## 1. 添加阿里的manen镜像
+
+
+
+```xml
+<!-- 第一步:修改maven根目录下的conf文件夹中的setting.xml文件-->
+<mirrors>
+    <mirror>
+      <id>alimaven</id>
+      <name>aliyun maven</name>
+      <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+      <mirrorOf>central</mirrorOf>        
+    </mirror>
+  </mirrors>
+
+<!-- 第二步: pom.xml文件里添加 -->
+<repositories>  
+        <repository>  
+            <id>alimaven</id>  
+            <name>aliyun maven</name>  
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>  
+            <releases>  
+                <enabled>true</enabled>  
+            </releases>  
+            <snapshots>  
+                <enabled>false</enabled>  
+            </snapshots>  
+        </repository>  
+</repositories>  
+```
+
+
+
+
+
 ## svn 导出纯代码
+
 1. 拷贝svn的项目,放在一个干净的目录下面.
 2. 执行下面的清理脚步,完成svn信息的清除.
 ```bat
@@ -17,7 +53,24 @@
 ## 把本地文件导入到maven仓库,避免从远程仓库导入
 ```
 mvn install:install-file -Dfile=~/ftp4j-1.6.jar -DgroupId=it.sauronsoftware -DartifactId=ftp4j -Dversion=1.6 -Dpackaging=jar
+
+
+mvn install:install-file -Dfile=~/data/soft/flink-1.10.0/lib/flink-table_2.12-1.10.0.jar -DgroupId=org.apache.flink -DartifactId=flink-table_2.12 -Dversion=1.10.0 -Dpackaging=jar
 ```
+
+
+
+<!-- https://mvnrepository.com/artifact/org.apache.flink/flink-table -->
+<dependency>
+    <groupId>org.apache.flink</groupId>
+    <artifactId>flink-table_2.11</artifactId>
+    <version>1.7.2</version>
+    <scope>provided</scope>
+</dependency>
+
+
+
+
 
 # common command
 

@@ -110,7 +110,7 @@ mysql>use mysql;
 mysql>update user set authentication_string=PASSWORD('123456') where User='root';
 -------------------------------------------------------------------------
 #版本小于5.7.6,执行下面的命令
-mysql> UPDATE user SET password=PASSWORD('123456') WHERE user='root';
+mysql> UPDATE user SET password=PASSWORD('manager') WHERE user='root';
 -------------------------------------------------------------------------
 mysql> FLUSH PRIVILEGES;
 mysql> quit
@@ -120,4 +120,4 @@ GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'mypassword' WITH GRANT 
 GRANT ALL PRIVILEGES ON *.* TO 'root'@'192.168.0.1' IDENTIFIED BY 'mypassword' WITH GRANT OPTION;
 
 
-GRANT ALL PRIVILEGES ON *.* TO 'cmwin'@'10.67.31.174' IDENTIFIED BY 'manager' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'manager' WITH GRANT OPTION;

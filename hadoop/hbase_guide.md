@@ -33,8 +33,6 @@ bin/hbase shell
 ```
 
 ## 主要的配置文件
-* conf/hbase-env.sh
-```sh
 export JAVA_HOME=/data/soft/jdk1.8.0_131
 export HBASE_MANAGES_ZK=false
 ```
