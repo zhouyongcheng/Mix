@@ -6,8 +6,30 @@
 
 ## 问题点
 1. 启动hive报which : no hbase in
-  在hive/lib目录中添加mysql的java驱动.
+    在hive/lib目录中添加mysql的java驱动.
 2. com.google.common.base.Preconditions.checkArgument
-  hadoop和hive的lib目录中,比较那个guava版本高,就用谁的覆盖.
+    hadoop和hive的lib目录中,比较那个guava版本高,就用谁的覆盖.
 
+
+
+```mysql
+CREATE TABLE mc.dept (
+	id int,
+ 	name string,
+ 	location string
+) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
+
+LOAD DATA INPATH '/mysql/cmwin' OVERWRITE INTO TABLE dept; 
+LOAD DATA INPATH '/mc/db/T_D_COMBO_CONTENT_INFO/*' OVERWRITE INTO TABLE T_D_COMBO_CONTENT_INFO; 
+```
+
+
+
+hive常用命令
+
+```shell
+/data/bin/hive-3.2.1/bin/hive
+show databases;
+
+```
 

@@ -26,6 +26,14 @@
 
 
 
+## 流处理中要解决的问题
+
+### 时间系列问题
+
+### 数据状态问题
+
+1. 状态保存
+2. 状态恢复
 
 
 
@@ -34,7 +42,8 @@
 
 
 
-## flinkd的优点
+
+## flink的优点
 
 1. 快
 2. 批流统一，同时支持批处理和流处理。
@@ -42,6 +51,15 @@
 4. 分布式，横向扩展容易，能处理大数据。
 5. checkpoint支持，就是断点续传的特定，能从savepoint进行有状态恢复。
 6. 低延迟，吞吐量高，exactly-once， 编程api丰富。api变化快，也是也个缺点。
+
+## flink的组件
+
+1. JobManager
+2. ResourceManager
+3. TaskManager
+4. Dispatcher
+
+JobManager从ResourceManager申请资源（taskmanager slots）来运行一个job中的各个task，通常情况下，一个flink集群环境下会运行着多个TaskManager， 每个taskManager能提供一定数量的slots. TaskManager会把自己有的资源信息注册到ResoureManager去。
 
 
 
@@ -57,7 +75,11 @@ bin/start_cluster.sh
 /bin/start-cluster.sh
 
 ## 创建flink的maven项目
+
+
+```shell
 curl https://flink.apache.org/q/quickstart.sh | bash -s 1.10.0
+```
 
 ## 提交任务job给flink框架进行处理
 ```

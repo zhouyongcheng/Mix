@@ -28,7 +28,7 @@ https://github.com/Farata/angular2typescript
 git rm --cached file_name
 
 # idea tomcat乱码
-Dfile.encoding=UTF-8
+-Dfile.encoding=UTF-8
 
 
 

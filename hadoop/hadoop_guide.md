@@ -123,3 +123,44 @@ YARN_NODEMANAGER_USER=cmwin
 
 ## 删除指定目录
 ./hdfs dfs -rm -f -R /mysql
+
+hdfs dfs -head -n 1 /mc/db/T_D_KEY_PRICE_INFO
+
+hadoop job -kill application_1587789850023_0043
+
+hadoop命令行 与job相关的：
+命令行工具 • 
+1.查看 Job 信息：
+hadoop job -list 
+2.杀掉 Job： 
+hadoop  job -kill  job_id
+3.指定路径下查看历史日志汇总：
+hadoop job -history output-dir 
+4.作业的更多细节： 
+hadoop job -history all output-dir 
+5.打印map和reduce完成百分比和所有计数器：
+hadoop job –status job_id 
+6.杀死任务。被杀死的任务不会不利于失败尝试：
+hadoop jab -kill-task <task-id> 
+7.使任务失败。被失败的任务会对失败尝试不利：
+hadoop job  -fail-task <task-id>
+
+随机返回指定行数的样本数据 
+hadoop fs -cat /mc/db/T_D_KEY_PRICE_INFO/* | shuf -n 5
+
+返回前几行的样本数据 
+hadoop fs -cat /test/gonganbu/scene_analysis_suggestion/* | head -100
+
+返回最后几行的样本数据 
+hadoop fs -cat /test/gonganbu/scene_analysis_suggestion/* | tail -5
+
+查看文本行数 
+hadoop fs -cat hdfs://172.16.0.226:8020/test/sys_dict/sysdict_case_type.csv |wc -l
+
+查看文件大小(单位byte) 
+hadoop fs -du hdfs://172.16.0.226:8020/test/sys_dict/*
+
+hadoop fs -count hdfs://172.16.0.226:8020/test/sys_dict/*
+————————————————
+版权声明：本文为CSDN博主「Ronney-Hua」的原创文章，遵循 CC 4.0 BY-SA 版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/github_38358734/java/article/details/79272521
