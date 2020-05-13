@@ -28,7 +28,7 @@
    把mysql的数据导入到hdfs
 
    ```sql
-   sqoop import --connect jdbc:mysql://127.0.0.1:3306/cmwin --username root --password manager --table dept --split-by deptno -m 1 --delete-target-dir --target-dir '/mysql/cmwin'
+   sqoop import --connect jdbc:mysql://192.168.101.3:3306/cmwin --username root --password manager --table dept --split-by deptno -m 3 --delete-target-dir --target-dir '/mysql/cmwin'
    ```
 
    

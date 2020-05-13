@@ -88,14 +88,18 @@ yarn webui 界面: http://192.168.101.3:8088
 * HDFS的文件列表
 > $HADOOP_HOME/bin/hadoop fs -ls <args>
 * 将数据插入到HDFS
+```shell
+$HADOOP_HOME/bin/hadoop fs -mkdir /user/input 
+$HADOOP_HOME/bin/hadoop fs -put /home/file.txt /user/input
+$HADOOP_HOME/bin/hadoop fs -ls /user/input
+$HADOOP_HOME/bin/hadoop fs -cat /user/output/outfile 
+从HDFS得到文件使用get命令在本地文件系统。
+$HADOOP_HOME/bin/hadoop fs -get /user/output/ /home/hadoop_tp/ 
+$HADOOP_HOME/bin/hdfs dfs -chmod  +w /flink/output
+$HADOOP_HOME/bin/hdfs dfs -cat /flink/output/*
 ```
-    $HADOOP_HOME/bin/hadoop fs -mkdir /user/input 
-    $HADOOP_HOME/bin/hadoop fs -put /home/file.txt /user/input
-    $HADOOP_HOME/bin/hadoop fs -ls /user/input
-    $HADOOP_HOME/bin/hadoop fs -cat /user/output/outfile 
-    从HDFS得到文件使用get命令在本地文件系统。
-    $HADOOP_HOME/bin/hadoop fs -get /user/output/ /home/hadoop_tp/ 
-```
+
+
 
 <configuration>
     <property>

@@ -1,4 +1,28 @@
-## 设备基础信息
+创建网络连接
+
+
+
+```shell
+# 查看物理网卡的信息
+nmcli device show  | grep -i device
+# 删除当前的连接
+nmcli connection show && nmcli connection delete enp5s0
+#创建一个新的连接
+nmcli connection add type ethernet autoconnect yes con-name eth0 ifname enp5s0 ip4 192.168.101.14 gw4 192.168.101.1
+# 添加dns信息
+nmcli connection modify eth0 ipv4.dns 10.1.1.26  +ipv4.dns 10.1.1.27
+#启动
+nmcli connection up eth0
+#显示详细信息  
+nmcli connection show
+nmcli connection show eth0
+
+```
+
+
+
+## 1. 设备基础信息
+
 ```
 1、查看CPU信息
 # 总核数 = 物理CPU个数 X 每颗物理CPU的核数
@@ -16,10 +40,6 @@ cat /proc/cpuinfo| grep "processor"| wc -l
 # 查看CPU信息（型号）
 cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c
 ```
-## 问题点
-1） tmpfs: Bad mount option huge
-2) intel corporation hd graphics 620 rev 02  (显卡)
-
 centos7 默认从KDE启动
 ```
 # yum -y groupinstall "Graphical Administration Tools"
@@ -31,7 +51,7 @@ centos7 默认从KDE启动
 echo "gnome-session" >> ~/.xinitrc
 echo "exec startkde" >> ~/.xinitrc
 
-## centos修改hostname
+## 2. centos修改hostname
 ```
 1. centos6:编辑以下两个文件
 /etc/hosts
@@ -47,7 +67,7 @@ HOSTNAME=node21
 hostnamectl --static set-hostname name
 ```
 
-## ssh免密登陆
+## 3. ssh免密登陆
 ```
 1. ssh-keygen -t rsa
 2. ssh-copy-id -i ~/.ssh/id_rsa.pub username@nodename
@@ -55,13 +75,48 @@ hostnamectl --static set-hostname name
 ssh-copy-id -i ~/.ssh/id_rsa.pub cmwin@node03
 ```
 
-## 软连接的创建
+## 4. 软连接的创建
 ln -s /data/MenuCenter file 
 /data/MenuCenter  -- 已经在本地存在的目录
 file : 要创建的link标识符
 
 
 sed -ie 's/192.168.0.1/192.168.0.2/g' /opt/msgct/application-pro.properties
+
+## 5. 防火墙
+
+### 5.1 禁止开启防火墙
+
+```shell
+# centos6
+chkconfig iptables off
+chkconfig iptables on
+# centos7
+
+```
+
+### 5.2 关闭防火墙
+
+```shell
+# centos6
+service iptables stop
+service iptables start
+service iptables status
+# centos7
+systemctl enable firewalld.service
+systemctl disable firewalld.service
+systemctl status firewalld.service
+```
+
+## 配置环境变量的方式
+
+```shell
+# 编辑/etc/profile
+# 编辑~/.bashrc
+# 在/etc/profile.d/myenv.sh, 这样，每次服务器启动的时候都会加载环境变量。
+```
+
+
 
 ## curl日常使用
 
@@ -162,3 +217,5 @@ showmount -e 172.20.193.33
 
 mount -t nfs 172.25.216.21:/data /data
 
+
+```

@@ -1,5 +1,18 @@
 # 虚拟机的相关内容
 
+## 注意事项
+
+```
+1、安装虚拟机后，后台运行服务，尽量移除不需要的设备，如cdrom，audio等，这样启动时不加载，避免不必要的错误。
+2、虚拟机安装成后台运行模式，不要图形界面。
+3、ip地址配置成固定ip地址。
+4、启动的时候加 --type headless
+```
+
+
+
+
+
 ## 虚机网络基本配置
 
 ````shell
@@ -37,14 +50,18 @@ DNS2=8.8.8.8
 ## 命令行启动虚拟机
 
 ```shell
+# centos7设置开机启动的模式
+systemctl get-default
+systemctl set-default multi-user.target
+
 # 要从远程打开和关闭虚拟机，需要虚拟机以命令行的方式启动
 vim /etc/inittab
 id:3:initdefault:
 #------------------------------------
 $ VBoxManage list vms
 $ VBoxManage list runningvms # 列出运行中的虚拟机
-$ VBoxManage startvm Centos6_1
-$ VBoxManage controlvm XP acpipowerbutton # 关闭虚拟机，等价于点击系统关闭按钮，正常关机
+$ VBoxManage startvm Centos6_1 --type headless  # 命令行方式启动虚拟机，无需显示器
+$ VBoxManage controlvm Centos6_1 acpipowerbutton # 关闭虚拟机，等价于点击系统关闭按钮，正常关机
 $ VBoxManage controlvm XP poweroff # 关闭虚拟机，等价于直接关闭电源，非正常关机
 $ VBoxManage controlvm XP pause # 暂停虚拟机的运行
 $ VBoxManage controlvm XP resume # 恢复暂停的虚拟机
