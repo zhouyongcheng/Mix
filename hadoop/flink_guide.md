@@ -3,7 +3,22 @@
 1. flink内部封装了状态数据，而且状态数据并不会被清理，因此一定要避免在一个无限数据流上使用aggregation。
 ```
 
-## 1. 本地安装
+## 1. flink指令集合
+
+### 1.1 集群命令
+
+````shell
+bin/start_cluster.sh
+bin/stop-cluster.sh
+````
+
+### 1.2 JobManager命令
+
+````shell
+bin/jobmanager.sh stop | start
+````
+
+
 
 ## 2. flink的集群安装
 
@@ -19,12 +34,60 @@
 
 ### 2.2 配置文件及修改
 
-| flink-conf.yml |      |      |
-| -------------- | ---- | ---- |
-| masters        |      |      |
-| slaves         |      |      |
-| zoo.cfg        |      |      |
-|                |      |      |
+| flink-conf.yml |                                                              |      |
+| -------------- | ------------------------------------------------------------ | ---- |
+| masters        | node03:8081                                                  |      |
+| slaves         | node21<br />node22<br />node23                               |      |
+| zoo.cfg        | server.1=node21:2888:3888<br/>server.2=node22:2888:3888 <br/>server.3=node23:2888:3888 |      |
+|                |                                                              |      |
+|                |                                                              |      |
+
+### 2.3 集群模式
+
+#### 2.3.1 standaloneHA模式
+
+````properties
+#  在Node03上配置完成后，把配置信息同步到node14, node21,node22,node23
+1> 需要配置zookeeper集群
+
+# conf/masters文件配置
+node03:8081
+node14:8081
+ 
+# conf/slaves文件配置
+node21
+node22
+node23
+ 
+# conf/flink-conf.ymal文件配置
+jobmanager.rpc.address: node03
+jobmanager.rpc.port: 6123
+high-availability: zookeeper
+high-availability.storageDir: hdfs:///flink/ha/
+high-availability.zookeeper.quorum: node21:2181,node22:2181,node23:2181
+high-availability.zookeeper.client.acl: open
+high-availability.zookeeper.path.root: /flink
+high-availability.cluster-id: /cluster-mc
+````
+
+
+
+#### 2.3.2 yarn管理模式
+
+```properties
+1）启动zookeeper集群
+2）启动hadoop集群。
+
+yarn-session.sh -n 2 -s 2 -jm 1024 -tm 1024 -nm test -d
+-n : TaskManager的数量
+-s ： slot的数量
+-jm ：JobManager的内存mb
+-tm : TaskManager的内存mb
+-nm ：yarn上的appName名
+-d： 后台运行
+```
+
+#### 
 
 
 
@@ -37,10 +100,16 @@
 |                   |                  |      |
 |                   |                  |      |
 
+## 流处理中要解决的问题
 
+### 时间系列问题
 
-## flinkd的优点
+### 数据状态问题
 
+1. 状态保存
+2. 状态恢复
+
+## flink的优点
 1. 快
 2. 批流统一，同时支持批处理和流处理。
 3. exactlyonce，精确一致性。
@@ -48,27 +117,30 @@
 5. checkpoint支持，就是断点续传的特定，能从savepoint进行有状态恢复。
 6. 低延迟，吞吐量高，exactly-once， 编程api丰富。api变化快，也是也个缺点。
 
-## 
+## flink的组件
+
+1. JobManager
+2. ResourceManager
+3. TaskManager
+4. Dispatcher
+
+JobManager从ResourceManager申请资源（taskmanager slots）来运行一个job中的各个task，通常情况下，一个flink集群环境下会运行着多个TaskManager， 每个taskManager能提供一定数量的slots. TaskManager会把自己有的资源信息注册到ResoureManager
 
 下载解压完成安装 [下载](http://flink.apache.org/downloads.html)
 
-## 启动本地实例, 非root用户
-```sh
-bin/start_cluster.sh
-bin/stop-cluster.sh
-```
-
-
-## 
 ## 创建flink的maven项目
+
+
+```shell
 curl https://flink.apache.org/q/quickstart.sh | bash -s 1.10.0
+```
 
 ## 提交任务job给flink框架进行处理
-```
+```shell
 1. flink run -m node21:8081 ./examples/batch/WordCount.jar --input /opt/wcinput/wc.txt --output /opt/wcoutput/
 2. flink run -m node21:8081 ./examples/batch/WordCount.jar --input hdfs:///user/admin/input/wc.txt --output hdfs:///user/admin/output2
 3. /data/soft/flink-1.9.0/bin/flink run -m node03:8081 ../quickstart/target/quickstart-0.1.jar --input /data/tmp/word.txt  --output /data/tmp/count.txt
-4. bin/flink run --class com.cmwin.wordcount.WordCountKafkaInStdOut /data/Projects/FlinkDemo/target/flink-demo-0.1.jar
+4. bin/flink run -c com.cmwin.wordcount.WordCountKafkaInStdOut /data/Projects/FlinkDemo/target/flink-demo-0.1.jar
 ```
 ## 输入到print中的信息查看
 >程序的输出会打到Flink主目录下面的log目录下的.out文件中
@@ -88,8 +160,34 @@ curl https://flink.apache.org/q/quickstart.sh | bash -s 1.10.0
 ## flink的集群模式
 
 * standalone： 不依赖其他的资源调度框架，不依赖yarn，kerberters等资源管理器。
+
 * cluster安装方式
-* 得
+
+* flink高可用配置
+
+  ```properties
+  #  在Node03上配置完成后，把配置信息同步到node14, node21,node22,node23上
+   # masters
+   node03:8081
+   node14:8081
+   
+   # slaves
+   node21
+   node22
+   node23
+   
+   # flink-conf.ymal
+   jobmanager.rpc.address: node03
+   jobmanager.rpc.port: 6123
+   high-availability: zookeeper
+   high-availability.storageDir: hdfs:///flink/ha/
+   high-availability.zookeeper.quorum: node21:2181,node22:2181,node23:2181
+   high-availability.zookeeper.client.acl: open
+   high-availability.zookeeper.path.root: /flink
+   high-availability.cluster-id: /cluster-mc
+  ```
+
+  
 
 ## 3. flink访问hive
 

@@ -122,6 +122,25 @@ bin/kafka-topics.sh  --delete --zookeeper 172.25.216.29：2182,172.25.216.30：2
 bin/kafka-topics.sh --zookeeper 172.25.216.29：2182,172.25.216.30：2182 --list 
 ```
 
+//首先我们需要知道当前有哪些消费者group，如果已知，此步骤可忽略
+bin/kafka-consumer-groups.sh --bootstrap-server 172.20.192.174:9092,172.20.193.32:9092,172.20.193.35:9092 --list
+bin/kafka-consumer-groups.sh --bootstrap-server 172.25.216.29:9092,172.25.216.30:9092 --group GROUP_NAME --describe
+
+kafka-consumer-groups.sh --zookeeper localhost:2181 --group g_product_sell_out_dmb --describe
+
+kafka-consumer-groups.sh --zookeeper localhost:2181 --group g_product_sell_out_message --describe
+
+kafka-consumer-groups.sh --zookeeper localhost:2181 --group g_product_sell_out_report --describe
+
+kafka-consumer-groups.sh --zookeeper localhost:2181 --group g_product_sell_out_trace --describe
+
+
+
+
+
+
+
+
 ## kafka多节点安装部署
 操作系统： linux
 磁盘规划： 因为kafka写入磁盘是顺序写入，所以机械硬盘（hdd）就能够满足需求。容量大便宜。

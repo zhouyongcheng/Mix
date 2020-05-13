@@ -27,15 +27,28 @@ mysql> ALTER DATABASE metastore CHARACTER SET latin1;
 
 ```
 
-
-
-
-
 ### metastore server开启
 
 ```
 hive --service metastore
 ```
 
+```mysql
+CREATE TABLE mc.dept (
+	id int,
+ 	name string,
+ 	location string
+) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
 
+LOAD DATA INPATH '/mysql/cmwin' OVERWRITE INTO TABLE dept; 
+LOAD DATA INPATH '/mc/db/T_D_COMBO_CONTENT_INFO/*' OVERWRITE INTO TABLE T_D_COMBO_CONTENT_INFO; 
+```
+
+hive常用命令
+
+```shell
+/data/bin/hive-3.2.1/bin/hive
+show databases;
+
+```
 

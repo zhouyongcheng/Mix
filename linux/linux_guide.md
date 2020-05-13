@@ -108,6 +108,14 @@ systemctl disable firewalld.service
 systemctl status firewalld.service
 ```
 
+## 配置环境变量的方式
+
+```shell
+# 编辑/etc/profile
+# 编辑~/.bashrc
+# 在/etc/profile.d/myenv.sh, 这样，每次服务器启动的时候都会加载环境变量。
+```
+
 
 
 ## curl日常使用
