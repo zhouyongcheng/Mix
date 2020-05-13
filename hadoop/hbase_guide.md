@@ -37,7 +37,7 @@ export JAVA_HOME=/data/soft/jdk1.8.0_131
 export HBASE_MANAGES_ZK=false
 ```
 * hbase-site.xml
-```xml
+​```xml
 <configuration>
   <property>
     <name>hbase.master.info.port</name>
@@ -78,9 +78,9 @@ node23.cmwin.com
 
 停止regionserver
 /bin/hbase-daemon.sh stop regionserver RegionServer
- 
+
 启动regionserver
 /bin/hbase-daemon.sh start regionserver RegionServer
- 
+
 重启regionserver
 bin/graceful_stop.sh --restart --reload --debug nodename

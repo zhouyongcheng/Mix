@@ -1,3 +1,6 @@
+home/cmwin/software/typora/bin/Typora-linux-x64/Typora --no-sandbox
+
+
 container for sharing
 plan for introducing mysql
 

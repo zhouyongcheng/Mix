@@ -20,7 +20,7 @@
    ```sql
    -- 列出服务器中的所有数据库
    sqoop list-databases --connect jdbc:mysql://127.0.0.1:3306 --username root --password manager
-   
+    
    -- 列出库中的所有表
    sqoop list-tables --connect jdbc:mysql://127.0.0.1:3306/cmwin --username root --password manager
    ```
