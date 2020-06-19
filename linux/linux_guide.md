@@ -1,6 +1,16 @@
+安装FinalShell
+
+```shell
+rm -f finalshell_install_linux.sh;
+wget www.hostbuf.com/downloads/finalshell_install_linux.sh;
+chmod +x finalshell_install_linux.sh;
+./finalshell_install_linux.sh;
+/usr/lib/FinalShell/bin
+```
+
+
+
 创建网络连接
-
-
 
 ```shell
 # 查看物理网卡的信息

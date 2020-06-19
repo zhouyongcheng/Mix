@@ -22,3 +22,6 @@
 * 
 
 SQL中各部分的执行顺序是：FROM → WHERE → GROUP BY → HAVING → SELECT( → ORDER BY)
+
+
+

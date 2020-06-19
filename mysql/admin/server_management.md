@@ -1,3 +1,14 @@
+## 常用命令
+
+```mysql
+mysql -uroot -p
+
+```
+
+
+
+
+
 mysqls数据库服务的启动，停止，维护等都使用mysql用户进行。
 #groupadd -g 33201 mysql
 #useradd mysql -u 43201 -g mysql
