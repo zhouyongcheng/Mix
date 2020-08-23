@@ -27,7 +27,12 @@ nohup /opt/codis/bin/codis-dashboard --config=/opt/codis/config/dashboard.toml -
 * ZooKeeper
 
 ## Codis-proxy
-  > codis-proxy 是客户端连接的 Redis 代理服务,可以部署多个 codis-proxy, 本身是无状态的。
+```
+sudo su -
+/opt/codis/bin/codis-admin --proxy=172.25.216.18:19000  --shutdown
+nohup /opt/codis/bin/codis-proxy --config=/opt/codis/config/proxy.toml --log=/tmp/proxy.log &
+coddis-proxy 是客户端连接的 Redis 代理服务,可以部署多个 codis-proxy, 本身是无状态的。
+```
 
 ## Codis-config
 > Codis 的管理工具, 支持包括, 添加/删除 Redis 节点, 添加/删除 Proxy 节点, 发起数据迁移等操作
@@ -35,4 +40,11 @@ nohup /opt/codis/bin/codis-dashboard --config=/opt/codis/config/dashboard.toml -
 ## codis-server
 > 相当于redis-server实例(instance) 
 
-> 
+
+
+### Codis的启动
+
+```bash
+nohup /opt/codis/bin/codis-server /opt/codis/config/redis6319.conf > /tmp/redis_6319.log &
+```
+

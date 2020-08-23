@@ -52,7 +52,7 @@
 
 ## 把本地文件导入到maven仓库,避免从远程仓库导入
 ```
-mvn install:install-file -Dfile=~/ftp4j-1.6.jar -DgroupId=it.sauronsoftware -DartifactId=ftp4j -Dversion=1.6 -Dpackaging=jar
+
 
 
 mvn install:install-file -Dfile=~/data/soft/flink-1.10.0/lib/flink-table_2.12-1.10.0.jar -DgroupId=org.apache.flink -DartifactId=flink-table_2.12 -Dversion=1.10.0 -Dpackaging=jar
