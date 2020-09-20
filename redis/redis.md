@@ -1,17 +1,39 @@
 
+
 # reference document
+
 [redis-guide](https://redis.io/topics/quickstart)
 
 [redis常用命令] (https://www.cnblogs.com/jtfr/p/10503803.html)
 
-# install redis
+## 安装Redis
+
+### 环境准备
+
+```shell
+# root用户操作
+yum -y install centos-release-scl
+yum -y install devtoolset-9-gcc devtoolset-9-gcc-c++ devtoolset-9-binutils
+echo "source /opt/rh/devtoolset-9/enable" >>/etc/profile
 ```
+
+### 安装
+
+```shell
+# 用root用户进行安装？
 wget -C http://download.redis.io/redis-stable.tar.gz
 tar xvzf redis-stable.tar.gz
 cd redis-stable
 make
 copy executed command to /usr/local/bin
 make install 
+
+------------------------------------------
+make distclean
+# 编译安装到指定目录下
+make PREFIX=/usr/local/redis install 
+# 卸载
+make uninstall
 
 src/redis-server
 src/redis-cli

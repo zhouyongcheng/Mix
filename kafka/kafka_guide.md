@@ -108,31 +108,49 @@ bin/kafka-topics.sh --list --zookeeper localhost:2181
 ```
 bin/kafka-console-producer.sh --broker-list 10.67.31.48:9092 --topic mytopic
 bin/kafka-console-consumer.sh --bootstrap-server 10.67.31.48:9092 --topic mytopic --from-beginning
+
+bin/kafka-console-producer.sh --broker-list 192.168.101.3:9092 --topic flink1
+bin/kafka-console-consumer.sh --bootstrap-server 192.168.101.3:9092 --topic flink1 --from-beginning
 ```
 
-## 修改topic的分区数
+## 增加topic的分区数
 ```sh
 bin/kafka-topics.sh --zookeeper localhost:2181 --alter --topic tp_product_sell_out_notification --partitions 9
 ```
 
 ## 删除topic及相关数据
-```
-bin/kafka-topics.sh  --delete --zookeeper 172.25.216.29：2182,172.25.216.30：2182 --topic tp_product_sell_out_notification
-bin/kafka-topics.sh  --delete --zookeeper 172.25.216.29：2182,172.25.216.30：2182 --topic tp_product_sell_out_notification_trace
-bin/kafka-topics.sh --zookeeper 172.25.216.29：2182,172.25.216.30：2182 --list 
+```shell
+# 只会删除zookeeper中的元数据，消息文件须手动删除
+bin/kafka-topics.sh  --delete --zookeeper localhost:2181 --topic tp_product_sell_out_notification 
+# 方法二：待验证
+bin/kafka-run-class.sh kafka.admin.DeleteTopicCommand --zookeeper localhost:2181 --topic test
 ```
 
-//首先我们需要知道当前有哪些消费者group，如果已知，此步骤可忽略
-bin/kafka-consumer-groups.sh --bootstrap-server 172.20.192.174:9092,172.20.193.32:9092,172.20.193.35:9092 --list
-bin/kafka-consumer-groups.sh --bootstrap-server 172.25.216.29:9092,172.25.216.30:9092 --group GROUP_NAME --describe
+## 消费者相关命令
 
+```shell
+# 首先我们需要知道当前有哪些消费者group，如果已知，此步骤可忽略
+bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+# 显示消费者组的相信信息
+bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group GROUP_NAME --describe
 kafka-consumer-groups.sh --zookeeper localhost:2181 --group g_product_sell_out_dmb --describe
+# 查看消费者组的成员信息(id,host,client_id, partitions)
+bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group group1 --members
+```
 
-kafka-consumer-groups.sh --zookeeper localhost:2181 --group g_product_sell_out_message --describe
+## 查看topic某分区偏移量最大（小）值
 
-kafka-consumer-groups.sh --zookeeper localhost:2181 --group g_product_sell_out_report --describe
+```shell
+bin/kafka-run-class.sh kafka.tools.GetOffsetShell --topic student --time -1 --broker-list localhost:9092 --partitions 0
+```
 
-kafka-consumer-groups.sh --zookeeper localhost:2181 --group g_product_sell_out_trace --describe
+## 查看topic消费进度
+
+```
+bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --group groupName
+```
+
+
 
 
 
