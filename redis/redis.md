@@ -4,7 +4,7 @@
 
 [redis常用命令] (https://www.cnblogs.com/jtfr/p/10503803.html)
 
-# install redis
+## 安装redis
 ```
 wget -C http://download.redis.io/redis-stable.tar.gz
 tar xvzf redis-stable.tar.gz
@@ -18,22 +18,21 @@ src/redis-cli
 src/redis-cli shutdown NOSAVE
 ```
 
-# admin command
->start redis server
-
-`src/redis-server /etc/redis.conf`
-
-```
-启动redis-server,并以守护进程的方式运行，在redis.conf文件中 daemonize=yes
-```
-
-## redis启动设置为服务形式启动
-将安装目录…/redis-3.0.3/utils下的启动脚本文件redis_init_script拷贝到/etc/init.d下，并重命名为redisd
-修改/etc/init.d/redisd文件：添加# chkconfig: 2345 90 10
+## 管理命令
+```shell
+# 启动redis-server,并以守护进程的方式运行，在redis.conf文件中 daemonize=yes
+src/redis-server /etc/redis.conf
+# redis启动设置为服务形式启动
+#将安装目录…/redis-3.0.3/utils下的启动脚本文件redis_init_script拷贝到/etc/init.d下，并重命名为redisd
+#修改/etc/init.d/redisd文件：
+#添加# chkconfig: 2345 90 10
 >90表示服务启动执行的优先级，10表示服务被关闭的优先级
-添加服务: chkconfig --add redisd
-根据启动脚本中配置文件路径，新建配置文件目录，拷贝文件到该目录下
-cp /usr/local/redis/redis-3.0.3/redis.conf   /etc/redis/6379.conf
+>添加服务: chkconfig --add redisd
+>根据启动脚本中配置文件路径，新建配置文件目录，拷贝文件到该目录下
+>cp /usr/local/redis/redis-3.0.3/redis.conf   /etc/redis/6379.conf
+```
+
+## redis常用命令
 
 
 ```
@@ -148,15 +147,15 @@ redis-cli>
 
 ```
 
-# redis-server configuration
-```
+## redis服务器配置
+```properties
 maxmemory=xxxxxx
 maxmemory-policy=[volatile-lru | allkeys-lru | volatile-ttl ]
 ```
 
 
-# sentinel configuration
-```
+## sentinel 配置
+```shell
 sentinel monitor mymaster 127.0.0.1 6379 2
 sentinel down-after-milliseconds mymaster 60000
 sentinel failover-timeout mymaster 180000
@@ -169,16 +168,13 @@ sentinel parallel-syncs resque 5
 ```
 
 
-# Tomcat + Redis 实现Session共享
-## Tomcat配置,引入jar包
-```
+## Tomcat + Redis 实现Session共享
+```shell
+# Tomcat配置,引入jar包
 tomcat-redis-session-manager1.2.jar
 jedis-2.8.0.jar
 commons-pool2-2.2.jar
-```
-
-## 配置context.xml
-```
+# 配置context.xml
 <Valve className="com.orangefunction.tomcat.redissessions.RedisSessionHandlerValve" />
     <Manager className="com.orangefunction.tomcat.redissessions.RedisSessionManager"
              host="172.16.100.200"
@@ -186,4 +182,129 @@ commons-pool2-2.2.jar
              database="15"    />
 ```
 
+## springboot2集成Redis
+
+### Redis 连接池简介
+
+```
+客户端连接 Redis 使用的是 TCP协议，直连的方式每次需要建立 TCP连接，而连接池的方式是可以预先初始化好客户端连接，所以每次只需要从 连接池借用即可，而借用和归还操作是在本地进行的，只有少量的并发同步开销，远远小于新建TCP连接的开销。另外，直连的方式无法限制 redis客户端对象的个数，在极端情况下可能会造成连接泄漏，而连接池的形式可以有效的保护和控制资源的使用。
+```
+
+### Jedis和lettuce对比
+
+```
+1、Jedis在实现上是直接连接的redis server，如果在多线程环境下是非线程安全的，这个时候只有使用连接池，为每个Jedis实例增加物理连接
+2、Lettuce的连接是基于Netty的，连接实例（StatefulRedisConnection）可以在多个线程间并发访问，应为StatefulRedisConnection是线程安全的，所以一个连接实例（StatefulRedisConnection）就可以满足多线程环境下的并发访问，当然这个也是可伸缩的设计，一个连接实例不够的情况也可以按需增加连接实例。
+```
+
+
+
+## RedisConfig
+
+```java
+@Configuration
+@ConditionalOnClass(RedisOperations.class)
+@EnableConfigurationProperties(RedisProperties.class)
+public class RedisCacheConfig {
+
+    private Environment env;
+
+    public RedisCacheConfig(Environment env) {
+        this.env = env;
+    }
+
+    /**
+     * @description 配置访问mc的codis的RedisTemplate
+     * @author zhouyc
+     * @param
+     * @return
+     * @date 2020/7/30 18:54
+     */
+    @Bean("redisTemplate")
+    public <String, Object> RedisTemplate<String, Object> redisTemplate(JedisConnectionFactory factory) {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(factory);
+        //key序列化方式;（不然会出现乱码;）,但是如果方法上有Long等非String类型的话，会报类型转换错误；
+        //所以在没有自己定义key生成策略的时候，以下这个代码建议不要这么写，可以不配置或者自己实现ObjectRedisSerializer
+        //或者JdkSerializationRedisSerializer序列化方式;
+        StringRedisSerializer keySerializer = new StringRedisSerializer();
+        JdkSerializationRedisSerializer valueSerializer = new JdkSerializationRedisSerializer();
+        redisTemplate.setKeySerializer(keySerializer);
+        redisTemplate.setHashKeySerializer(keySerializer);
+        redisTemplate.setValueSerializer(valueSerializer);
+        redisTemplate.setHashValueSerializer(valueSerializer);
+        return redisTemplate;
+    }
+
+    /**
+     * 配置第一个数据源的RedisTemplate
+     * 注意：这里指定使用名称=factory2 的 RedisConnectionFactory
+     *
+     * @param factory
+     * @return
+     */
+    @Bean("redisTemplate2")
+    public RedisTemplate<String, Object> redisTemplate2(JedisConnectionFactory factory) {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(factory);
+        // 使用Jackson2JsonRedisSerialize 替换默认序列化（备注，此处我用Object为例，各位看官请换成自己的类型哦~）
+        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
+        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+        jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
+        redisTemplate.setKeySerializer(stringRedisSerializer);
+        redisTemplate.setValueSerializer(stringRedisSerializer);
+        redisTemplate.setHashKeySerializer(stringRedisSerializer);
+        redisTemplate.setHashValueSerializer(jackson2JsonRedisSerializer);
+        redisTemplate.afterPropertiesSet();
+        return redisTemplate;
+    }
+
+    @Bean("factory")
+    public JedisConnectionFactory factory(JedisPoolConfig jedisPoolConfig) {
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
+        //设置redis服务器的host或者ip地址
+        redisStandaloneConfiguration.setHostName(env.getProperty("spring.redis.host"));
+        //设置默认使用的数据库
+        redisStandaloneConfiguration.setDatabase(Integer.parseInt(env.getProperty("spring.redis.database")));
+        //设置redis的服务的端口号
+        redisStandaloneConfiguration.setPort(Integer.parseInt(env.getProperty("spring.redis.port")));
+        // 获得默认的连接池构造器(怎么设计的，为什么不抽象出单独类，供用户使用呢)
+        JedisClientConfiguration.JedisPoolingClientConfigurationBuilder jedisBuilder = (JedisClientConfiguration.JedisPoolingClientConfigurationBuilder) JedisClientConfiguration.builder();
+        jedisBuilder.poolConfig(jedisPoolConfig);
+        JedisClientConfiguration jedisClientConfiguration = jedisBuilder.build();
+        return new JedisConnectionFactory(redisStandaloneConfiguration, jedisClientConfiguration);
+    }
+
+    /**
+     * 连接池配置信息
+     * @return
+     */
+    @Bean
+    public JedisPoolConfig jedisPoolConfig() {
+        JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
+        //最大连接数
+        jedisPoolConfig.setMaxTotal(60);
+        // 最大空闲连接
+        jedisPoolConfig.setMaxIdle(50);
+        //最小空闲连接数
+        jedisPoolConfig.setMinIdle(50);
+        // 当资源池连接用尽后，调用者的最大等待时间（单位为毫秒，30秒后还未获取的时候，失败处理）。
+        jedisPoolConfig.setMaxWaitMillis(30000);
+        // 是否开启空闲资源检测。
+        jedisPoolConfig.setTestWhileIdle(true);
+        jedisPoolConfig.setTestOnBorrow(true);
+        jedisPoolConfig.setTestOnReturn(true);
+        // 空闲资源的检测周期（单位为毫秒, 10秒检查下）
+        jedisPoolConfig.setTimeBetweenEvictionRunsMillis(10*1000);
+        //资源池中资源的最小空闲时间（单位为毫秒，30秒后释放），达到此值后空闲资源将被移除。
+        jedisPoolConfig.setMinEvictableIdleTimeMillis(30*1000);
+        // 做空闲资源检测时，每次检测资源的个数。
+        jedisPoolConfig.setNumTestsPerEvictionRun(-1);
+        return jedisPoolConfig;
+    }
+}
+```
 
