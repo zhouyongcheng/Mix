@@ -1,4 +1,20 @@
+## 学习资料
+
+
+
+[flink学习Aliyun]: https://developer.aliyun.com/article/753
+
+
+
+```
+https://developer.aliyun.com/article/753999
+
+```
+
+
+
 # 注意事项
+
 ```
 1. flink内部封装了状态数据，而且状态数据并不会被清理，因此一定要避免在一个无限数据流上使用aggregation。
 ```
@@ -8,8 +24,11 @@
 ### 1.1 集群命令
 
 ````shell
+bin/flink --version
 bin/start_cluster.sh
 bin/stop-cluster.sh
+http://localhost:8081
+nc -l 9999   -- 开启socket连接
 ````
 
 ### 1.2 JobManager命令
@@ -18,19 +37,91 @@ bin/stop-cluster.sh
 bin/jobmanager.sh stop | start
 ````
 
+1.3 提交程序到flink执行
+
+```shell
+mvn clean package -Dmaven.test.skip=true
+flink run -c demo.SocketTextStreamWordCount /home/demo/word-count-1.0-SNAPSHOT.jar 127.0.0.1 9000
+nc -l 9999
+```
+
 
 
 ## 2. flink的集群安装
 
 ### 2.1 服务器配置列表
 
-| 节点名称              |    flink    |      |      |      |      |
-| --------------------- | :---------: | ---- | ---- | ---- | ---- |
-| node03:192.168.101.3  | JobManager  |      |      |      |      |
-| node14:192.168.101.14 |             |      |      |      |      |
-| node21:192.168.101.21 | TaskManager |      |      |      |      |
-| node22:192.168.101.22 | TaskManager |      |      |      |      |
-| node23:192.168.101.23 | TaskManager |      |      |      |      |
+| 节点名称              |    flink    | PC      |      |      |      |
+| --------------------- | :---------: | ------- | ---- | ---- | ---- |
+| node03:192.168.101.3  | JobManager  | thinkpd |      |      |      |
+| node14:192.168.101.14 |             | server  |      |      |      |
+| node21:192.168.101.21 | TaskManager | server  |      |      |      |
+| node22:192.168.101.22 | TaskManager | server  |      |      |      |
+| node23:192.168.101.23 | TaskManager | server  |      |      |      |
+
+### 2.2 配置文件
+
+#### 2.2.1 基础信息配置[JobManager, TaskManager]
+
+```yaml
+# 在一台服务器上配置完成后，复制到其他服务器就可以。
+# jobManager 的IP地址
+jobmanager.rpc.address: localhost
+
+# JobManager 的端口号
+jobmanager.rpc.port: 6123
+
+# JobManager JVM heap 内存大小
+jobmanager.heap.size: 1024m
+
+# TaskManager JVM heap 内存大小
+taskmanager.heap.size: 1024m
+
+# 每个 TaskManager 提供的任务 slots 数量大小
+
+taskmanager.numberOfTaskSlots: 1
+
+# 程序默认并行计算的个数
+parallelism.default: 1
+
+# 文件系统来源
+# fs.default-scheme
+```
+
+#### 2.2.2  高可用配置
+
+```yaml
+# 可以选择 'NONE' 或者 'zookeeper'.
+# high-availability: zookeeper
+
+# 文件系统路径，让 Flink 在高可用性设置中持久保存元数据
+# high-availability.storageDir: hdfs:///flink/ha/
+
+# zookeeper 集群中仲裁者的机器 ip 和 port 端口号
+# high-availability.zookeeper.quorum: localhost:2181
+
+# 默认是 open，如果 zookeeper security 启用了该值会更改成 creator
+# high-availability.zookeeper.client.acl: open
+
+```
+
+#### 2.2.3 容错和检查点 配置
+
+```yaml
+# 用于存储和检查点状态
+# state.backend: filesystem
+
+# 存储检查点的数据文件和元数据的默认目录
+# state.checkpoints.dir: hdfs://namenode-host:port/flink-checkpoints
+
+# savepoints 的默认目标目录(可选)
+# state.savepoints.dir: hdfs://namenode-host:port/flink-checkpoints
+
+# 用于启用/禁用增量 checkpoints 的标志
+# state.backend.incremental: false
+```
+
+
 
 ### 2.2 配置文件及修改
 
@@ -42,7 +133,21 @@ bin/jobmanager.sh stop | start
 |                |                                                              |      |
 |                |                                                              |      |
 
+
+
 ### 2.3 集群模式
+
+#### 2.3.0 本地开发模式
+
+```properties
+1: 直接下载并解压到~/soft目录下。
+2: bin/start-cluster.sh
+3: http://localhost:8081
+4: bin/flink run examples/streaming/WordCount.jar
+5: bin/stop-cluster.sh
+```
+
+
 
 #### 2.3.1 standaloneHA模式
 
@@ -117,6 +222,223 @@ yarn-session.sh -n 2 -s 2 -jm 1024 -tm 1024 -nm test -d
 5. checkpoint支持，就是断点续传的特定，能从savepoint进行有状态恢复。
 6. 低延迟，吞吐量高，exactly-once， 编程api丰富。api变化快，也是也个缺点。
 
+## flink的数据源
+
+```properties
+# 基于集合
+1、fromCollection(Collection) - 从 Java 的 Java.util.Collection 创建数据流。集合中的所有元素类型必须相同。
+2、fromCollection(Iterator, Class) - 从一个迭代器中创建数据流。Class 指定了该迭代器返回元素的类型。
+3、fromElements(T …) - 从给定的对象序列中创建数据流。所有对象类型必须相同。
+
+# 基于集合
+final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+DataStream<String> text = env.readTextFile("file:///path/to/file");
+
+# 基于socket
+
+# 第三方或自己定义source
+StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+DataStream<KafkaEvent> input = env
+		.addSource(
+			new FlinkKafkaConsumer011<>(
+				parameterTool.getRequired("input-topic"), //从参数中获取传进来的 topic 
+				new KafkaEventSchema(),
+				parameterTool.getProperties())
+			.assignTimestampsAndWatermarks(new CustomWatermarkExtractor()));
+			
+# 			
+```
+
+
+
+## flink的sink
+
+```properties
+# 目的： 把处理的结果存入到指定的sink中
+```
+
+## flink的转化操作
+
+### Map操作  
+
+```java
+# 输入1个内容，转化为另外一个内容。
+    SingleOutputStreamOperator<Student> map = student.map(new MapFunction<Student, Student>() {
+        @Override
+        public Student map(Student value) throws Exception {
+            Student s1 = new Student();
+            s1.id = value.id;
+            s1.name = value.name;
+            s1.password = value.password;
+            s1.age = value.age + 5;
+            return s1;
+        }
+});
+map.print();
+
+```
+
+###  FlatMap:
+
+```java
+# 输入1个内容，转化为0个或在多个内容。
+SingleOutputStreamOperator<Student> flatMap = student.flatMap(new FlatMapFunction<Student, Student>() {
+    @Override
+    public void flatMap(Student value, Collector<Student> out) throws Exception {
+        if (value.id % 2 == 0) {
+            out.collect(value);
+        }
+    }
+});
+flatMap.print();
+
+
+```
+
+### Filter
+
+```java
+// 条件为true的数据返回到，false的丢弃。
+SingleOutputStreamOperator<Student> filter = student.filter(new FilterFunction<Student>() {
+    @Override
+    public boolean filter(Student value) throws Exception {
+        if (value.id > 95) {
+            return true;
+        }
+        return false;
+    }
+});
+filter.print();
+```
+
+### KeyBy
+
+```java
+// 逻辑上是基于 key 对流进行分区。在内部，它使用 hash 函数对流进行分区。它返回 KeyedDataStream 数据流
+KeyedStream<Student, Integer> keyBy = student.keyBy(new KeySelector<Student, Integer>() {
+    @Override
+    public Integer getKey(Student value) throws Exception {
+        return value.age;
+    }
+});
+keyBy.print();
+```
+
+### Reduce
+
+```java
+//Reduce 返回单个的结果值，并且 reduce 操作每处理一个元素总是创建一个新值。常用的方法有 average, sum, min, max, count，使用 reduce 方法都可实现。
+SingleOutputStreamOperator<Student> reduce = student.keyBy(new KeySelector<Student, Integer>() {
+    @Override
+    public Integer getKey(Student value) throws Exception {
+        return value.age;
+    }
+}).reduce(new ReduceFunction<Student>() {
+    @Override
+    public Student reduce(Student value1, Student value2) throws Exception {
+        Student student1 = new Student();
+        student1.name = value1.name + value2.name;
+        student1.id = (value1.id + value2.id) / 2;
+        student1.password = value1.password + value2.password;
+        student1.age = (value1.age + value2.age) / 2;
+        return student1;
+    }
+});
+reduce.print();
+```
+
+### Aggregation
+
+```java
+// 例如 min，max，sum 等。 这些函数可以应用于 KeyedStream 以获得 Aggregations 聚合。
+// max 和 maxBy 之间的区别在于 max 返回流中的最大值，但 maxBy 返回具有最大值的键， min 和 minBy 同理。
+KeyedStream.sum(0) 
+KeyedStream.sum("key") 
+KeyedStream.min(0) 
+KeyedStream.min("key") 
+KeyedStream.max(0) 
+KeyedStream.max("key") 
+KeyedStream.minBy(0) 
+KeyedStream.minBy("key") 
+KeyedStream.maxBy(0) 
+KeyedStream.maxBy("key")
+```
+
+
+
+### union
+
+```java
+// Union 函数将两个或多个数据流结合在一起。 这样就可以并行地组合数据流。 如果我们将一个流与自身组合，那么它会输出每个记录两次。
+inputStream.union(inputStream1, inputStream2, ...);
+```
+
+### Split
+
+```java
+// 根据条件将流拆分为两个或多个流。 当您获得混合流并且您可能希望单独处理每个数据流时，可以使用此方法。
+SplitStream<Integer> split = inputStream.split(new OutputSelector<Integer>() {
+    @Override
+    public Iterable<String> select(Integer value) {
+        List<String> output = new ArrayList<String>(); 
+        if (value % 2 == 0) {
+            output.add("even");
+        }
+        else {
+            output.add("odd");
+        }
+        return output;
+    }
+});
+```
+
+### Select
+
+```java
+// 功能允许您从拆分流中选择特定流。
+SplitStream<Integer> split;
+DataStream<Integer> even = split.select("even"); 
+DataStream<Integer> odd = split.select("odd"); 
+DataStream<Integer> all = split.select("even","odd");
+
+```
+
+
+
+### 窗口函数
+
+```java
+// umbling time windows(翻滚时间窗口)
+data.keyBy(1)
+	.timeWindow(Time.minutes(1)) //tumbling time window 每分钟统计一次数量和
+	.sum(1);
+//sliding time windows(滑动时间窗口)
+data.keyBy(1)
+	.timeWindow(Time.minutes(1), Time.seconds(30)) //sliding time window 每隔 30s 统计过去一分钟的数量和
+	.sum(1);
+```
+
+### count window
+
+```java
+data.keyBy(1)
+	.countWindow(100) //统计每 100 个元素的数量之和
+	.sum(1);
+	
+	//每 10 个元素统计过去 100 个元素的数量之和
+	data.keyBy(1) 
+	.countWindow(100, 10) 
+	.sum(1);
+```
+
+
+
+
+
+
+
+
+
 ## flink的组件
 
 1. JobManager
@@ -132,10 +454,35 @@ JobManager从ResourceManager申请资源（taskmanager slots）来运行一个jo
 
 
 ```shell
-curl https://flink.apache.org/q/quickstart.sh | bash -s 1.10.0
+1. curl https://flink.apache.org/q/quickstart.sh | bash -s 1.11.1
+2. 在idea中打开项目
+3. 注释调maven依赖中的provided,这样就能直接在idea中运行项目。
+4. 把demo代码中的env.execute("Flink Batch Java API Skeleton");给注释掉，否则会报错。
+5. ctrl + shif + f10运行代码。
 ```
 
+示例代码
+
+```java
+public class BatchJob {
+
+	public static void main(String[] args) throws Exception {
+		// set up the batch execution environment
+		final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
+		DataSource<String> dataSource = env.fromElements("a", "b", "c");
+		long count = dataSource.count();
+		System.out.println("element count = "+ count);
+//		env.execute("Flink Batch Java API Skeleton");
+	}
+}
+```
+
+
+
+
+
 ## 提交任务job给flink框架进行处理
+
 ```shell
 1. flink run -m node21:8081 ./examples/batch/WordCount.jar --input /opt/wcinput/wc.txt --output /opt/wcoutput/
 2. flink run -m node21:8081 ./examples/batch/WordCount.jar --input hdfs:///user/admin/input/wc.txt --output hdfs:///user/admin/output2

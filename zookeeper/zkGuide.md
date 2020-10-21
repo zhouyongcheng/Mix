@@ -12,7 +12,7 @@
 ````
 tickTime=2000
 dataDir=/var/lib/zookeeper/
-dataLogDir=/var/logs/zookeeper  [单独硬盘：推荐]
+dataLogDir=/var/logs/zookeeper
 clientPort=2181
 initLimit=5
 syncLimit=2 
@@ -20,7 +20,7 @@ preAllocSize=64M
 snapCount=100000
 traceFile=/tmp/zookeeper/log
 autopurge.snapRetainCount=5
-autopurge.purgeInterval=0           [bin/zkCleanup.sh]
+autopurge.purgeInterval=0
 syncEnabled=true
 server.1=192.168.122.1:2888:3888
 server.2=zoo2:2888:3888
@@ -30,7 +30,7 @@ server.3=zoo3:2888:3888
 ```
 bin/zkServer.sh start
 bin/zkServer.sh stop
-```  
+```
 
 * 启动客户端
 ```
