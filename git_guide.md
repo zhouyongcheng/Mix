@@ -29,6 +29,11 @@
 </repositories>  
 ```
 
+## 保存git的密码
+git config --global credential.helper store
+git config --global user.name "username"
+git config --global user.email "xxx.mail"
+
 
 
 
