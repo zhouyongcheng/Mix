@@ -2,6 +2,67 @@ https://github.com/heibaiying/spring-samples-for-all
 
 https://www.jianshu.com/u/f1c47972d390
 
+## SpringBoot2全局事务配置
+
+```java
+/**
+ *  注意事项：在service的方法中，如果捕获并处理了异常，则事务会失效。（Exception导致回滚，被捕获后，回滚失效）
+ */
+@Aspect
+@Configuration
+@EnableTransactionManagement
+public class TransactionAdviceConfig {
+
+    private static final String AOP_POINTCUT_EXPRESSION = "execution (* com.cmwin.demo..*Service*.*(..))";
+
+    private PlatformTransactionManager transactionManager;
+
+    public TransactionAdviceConfig(PlatformTransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
+    }
+
+    @Bean
+    public TransactionInterceptor txAdvice() {
+        // 更新操作（insert, update, delete)
+        DefaultTransactionAttribute txAttr_REQUIRED = new DefaultTransactionAttribute();
+        txAttr_REQUIRED.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        // 只读
+        DefaultTransactionAttribute txAttr_REQUIRED_READONLY = new DefaultTransactionAttribute();
+        txAttr_REQUIRED_READONLY.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        txAttr_REQUIRED_READONLY.setReadOnly(true);
+        // 根据方法名称的不同，选择不同的事务隔离级别。
+        // 更新操作
+        NameMatchTransactionAttributeSource source = new NameMatchTransactionAttributeSource();
+        source.addTransactionalMethod("add*", txAttr_REQUIRED);
+        source.addTransactionalMethod("save*", txAttr_REQUIRED);
+        source.addTransactionalMethod("delete*", txAttr_REQUIRED);
+        source.addTransactionalMethod("update*", txAttr_REQUIRED);
+        source.addTransactionalMethod("exec*", txAttr_REQUIRED);
+        source.addTransactionalMethod("set*", txAttr_REQUIRED);
+
+        // 查询操作
+        source.addTransactionalMethod("get*", txAttr_REQUIRED_READONLY);
+        source.addTransactionalMethod("query*", txAttr_REQUIRED_READONLY);
+        source.addTransactionalMethod("find*", txAttr_REQUIRED_READONLY);
+        source.addTransactionalMethod("list*", txAttr_REQUIRED_READONLY);
+        source.addTransactionalMethod("count*", txAttr_REQUIRED_READONLY);
+        source.addTransactionalMethod("is*", txAttr_REQUIRED_READONLY);
+        return new TransactionInterceptor(transactionManager, source);
+    }
+
+    @Bean
+    public Advisor txAdviceAdvisor() {
+        AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
+        pointcut.setExpression(AOP_POINTCUT_EXPRESSION);
+        return new DefaultPointcutAdvisor(pointcut, txAdvice());
+    }
+}
+```
+
+
+
+
+
 
 ## 使用了 Eureka 就自动具有了注册中心、负载均衡、故障转移的功能
 

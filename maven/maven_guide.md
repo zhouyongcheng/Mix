@@ -34,6 +34,56 @@
 mvn install:install-file -Dfile=c:/ftp4j-1.6.jar -DgroupId=it.sauronsoftware -DartifactId=ftp4j -Dversion=1.6 -Dpackaging=jar
 ```
 
+## 将外部jar打包到运行文件中
+
+```xml
+<build>
+        <resources>
+            <resource>
+                <directory>${project.basedir}/src/main/resources/lib</directory>
+                <targetPath>BOOT-INF/lib/</targetPath>
+                <includes>
+                    <include>**/*.jar</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                    <compilerArguments>
+                        <extdirs>${basedir}\src\main\resources\lib</extdirs>
+                    </compilerArguments>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <includeSystemScope>true</includeSystemScope>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+```
+
+
+
+springboot2 maven指定运行环境
+
+```properties
+mvn spring-boot:run -Drun.profiles=ks
+
+# 通过java运行时候指定profile
+java -jar -Dspring.profiles.active=ks sellout-portal.jar
+```
+
+
+
 
 
 ## flink的idea插件
