@@ -46,6 +46,49 @@ systemctl status docker.service
 ````
 
 ## get mirror
+
+
+
+https://www.cnblogs.com/wushuaishuai/p/9984210.html
+
+
+
+## 配置 Docker 镜像加速
+
+```properties
+https://registry.docker-cn.com
+
+http://hub-mirror.c.163.com
+
+https://3laho3y3.mirror.aliyuncs.com
+
+http://f1361db2.m.daocloud.io
+
+https://mirror.ccs.tencentyun.com
+
+# 配置方式
+mkdir -p /etc/docker
+touch /etc/docker/daemon.json
+{
+  "registry-mirrors": ["https://3laho3y3.mirror.aliyuncs.com"]
+}
+# 重启一下 Docker
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+```
+
+
+
+
+
+### 获取mysql的image
+
+```
+docker pull mysql:5.7
+```
+
+
+
 ````
 docker pull registry.hub.docker.com/ubuntu:latest
 docker pull dl.dockerpool.com:5000/ubuntu
@@ -55,7 +98,7 @@ docker pull ubuntu:14.04
 ````
 
 ## use image to create container
-```
+```shell
 docker create -it ubuntu             // create the container but at stop status
 -t :  pseudo-tty   terminal
 -i : container standard input open status.
@@ -65,6 +108,9 @@ docker attach container_names
 docker exec -it container_name  /bin/bash
 
 docker run -t -i ubuntu /bin/bash    // create and start the container
+
+# 交互方式，退出删除容器
+docker run -it --rm ubuntu
 ```
 
 ## docker的镜像管理(must use root to do management)
@@ -198,7 +244,7 @@ docker run -d --hostname myhostname -p 5671:5671 -p 5672:5672 -p 4369:4369 -p 25
 docker ps
 docker logs xxxx  (xxxx = ps find id)
 http://localhost:15672  guest/guest
-``` 
+```
 
 ## docker run options
 ```

@@ -1,7 +1,15 @@
-yum -y install lvm2 device-mapper device-mapper-persistent-data device-mapper-event device-mapper-libs device-mapper-event-libs
+安装docker
 
-yum -y --nogpgcheck install docker
+https://docs.docker.com/engine/install/centos/
 
+```
+sudo yum remove docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-engine
+```
 
-**game**
-[live](http://www.baidu.com)

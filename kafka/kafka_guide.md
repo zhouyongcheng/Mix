@@ -88,7 +88,7 @@ kafka消息采用二进制来保存，但仍然是结构化的数据。便于消
 # kafka常用命令
 ## 创建topic
 ```
-bin/kafka-topics.sh --create --zookeeper localhost:2181 --topic test --replication-factor 1 --partitions 1 
+bin/kafka-topics.sh --create --zookeeper localhost:2181 --topic cdn-log --replication-factor 1 --partitions 1 
 查看创建的topic的详细信息
 bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic test
 列出创建的topic列表信息
@@ -100,13 +100,15 @@ bin/kafka-topics.sh --list --zookeeper localhost:2181
 
 ## 多副本，多partition的topic创建
 ```
- bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 3 --partitions 1 --topic my-replicated-topic
+ bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic my-replicated-topic
  bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic my-replicated-topic
 ```
 
 ## 通过kafka的控制台发生消息和消费消息
 ```
 bin/kafka-console-producer.sh --broker-list 10.67.31.48:9092 --topic mytopic
+bin/kafka-console-producer.sh --broker-list localhost:9092 --topic cdn-log
+
 bin/kafka-console-consumer.sh --bootstrap-server 10.67.31.48:9092 --topic mytopic --from-beginning
 
 bin/kafka-console-producer.sh --broker-list 192.168.101.3:9092 --topic flink1

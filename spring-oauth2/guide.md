@@ -12,7 +12,25 @@ http://localhost:5555/uaa/oauth/authorize?response_type=code&client_id=menuCente
 
 [spring-oauth资源] (https://www.baeldung.com/spring-security-oauth-jwt)
 
+## 系统安全
+
+* 用户： 一堆可以进行的[行为集合]。
+
+```properties
+可见的菜单
+可用的功能（页面的功能按钮，查看、新增、修改、删除、审核等）
+数据权限： 同一个页面上看到的数据不相同。解决方案一般是把数据和具体的组织架构关联起来
+可写的数据。
+```
+
+* 权限： 可以访问的资源。
+* 授权： 给用户授予访问某个资源的能力。
+* 
+
+
+
 ## 安全问题
+
 ```
 1. 对外提供的api访问的安全控制
 2. 做为api的客户端的安全控制
@@ -47,6 +65,7 @@ token持久化的作用什么？为什么要把token存入到数据库或者redi
 
 ## oauth2的作用
 * 用户只需要一个账户和密码，就能在各种客户端上访问有权使用的资源，无需在各个客户端进行注册。
+  
   > 前提条件： 用户使用的资源系统有相应的授权服务器，并且各个客户端系统有访问客户资源的对接功能。
 
 ## 角色:
@@ -153,7 +172,7 @@ public void configure(AuthorizationServerSecurityConfigurer security) throws Exc
     }
 }
   ```
- 
+
 *  token的endpoint的基础信息设置
    1. 通过tokenEnhancer,在token中添加额外信息,比如用户角色权限信息等.不要放置敏感信息.
    2. 设在token存储的方式,本例使用的是jwt,这样无需在服务器端进行存储.
@@ -281,7 +300,7 @@ public JwtAccessTokenConverter accessTokenConverter() {
 
 
 6. 自定义认证服务器的登陆页面
-    
+   
 7. 客户端使用用户名密码进行登陆
 
 
@@ -362,7 +381,7 @@ code：表示上一步获得的授权吗，必选
 redirect_uri：重定向URI，必选，与步骤 A 中保持一致
 client_id：表示客户端ID，必选
 ```
- 
+
 
 **授权服务器返回令牌的response内容**
 ```
@@ -514,7 +533,7 @@ JWT的处理
 	spring框架本身提供的JdbcTokenStore,只需要配置数据源DataSource,然后调用JdbcTokenStore就好了。
     
    - 通过授权服务器解析令牌。授权服务器的check_token端点(endpoint)验证令牌的有效性。
-  
+
 ## 授权服务器配置
   - TokenStore: Token的存储方式及解析方式。
   - AuthenticationManager: 用户的认证方式。
@@ -528,7 +547,7 @@ JWT的处理
      - userDetialService
      - tokenServices.
 
-   
+
 ## 资源服务器配置
 * 要访问资源服务器受保护的资源需要携带令牌（从授权服务器获得）
 * 客户端往往同时也是一个资源服务器，各个服务之间的通信（访问需要权限的资源）时需携带访问令牌

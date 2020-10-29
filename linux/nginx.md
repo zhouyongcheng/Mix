@@ -1,4 +1,9 @@
 # nginx配置
+
+
+
+https://www.cnblogs.com/wushuaishuai/tag/nginx/
+
 /etc/nginx/..
 
 ## 查看nginx的模块信息
