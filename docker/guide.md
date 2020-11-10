@@ -1,3 +1,5 @@
+[TOC]
+
 # spring cloud guide
 
 ## EurekaCenter: 8001
@@ -23,6 +25,7 @@ sudo yum remove docker \`
 ```
 
 ## 安装一些必要的系统工具：
+
 ```
 sudo yum install -y yum-utils device-mapper-persistent-data lvm2
 添加软件源信息：
@@ -120,41 +123,74 @@ docker push image_name:[tag]
 
 
 
-## docker容器管理
-````
-创建容器并处于停止状态，启动容器
+## docker命令
+````properties
+docker version
+docker info
+# 搜镜像信息
+docker search
+docker pull tomcat:latest
+docker rmi id
+# 删除所有的images
+docker rmi -f $(docker images -aq)
+
+# 容器命令
+# 创建容器并处于停止状态，启动容器
 docker create -it image_id
 docker start container_id
 
 创建并同时启动容器,执行指定指令，centos代表的是image名
 docker run centos /bin/echo 'hello world'
+docker run -it centos /bin/bash
 
 如果一个容器已经停止，则必须用run方法进行启动
 docker run image
+--name ： 给容器起个名字
+-d     ： 后台进程
+-it    ：交换，启动后台
+-p     :  8080:8080 (主机端口：容器端口)
+
 以守护进程的方式运行容器
 docker run -d -p 4001:4001 --name spring-boot spring-boot-image
-查看守护进程的输出内容
+# 查看守护进程的输出内容
 docker logs container_id
-停止容器
+# 停止容器
 docker stop container_id
-查看处于终止状态的容器，并重新启动
+# 查看处于终止状态的容器，并重新启动
 docker ps -a -q
 docker start container_id
 docker restart container_id
-// 查看运行着的容器
-docker ps   
-// 查看本地所有的容器，包括不运行的 
-docker ps -a
-// 删除指定的容器，才能删除指定的镜像
-docker rm container_id
-// 进入后台的进程
-docker attach container_name
-docker exec -it container_id /bin/bash
-// 停止运行的容器
+# 停止运行的容器
 docker stop container_id
-// 导出容器
+docker kill container_id
+# 停止运行的容器
+docker stop container_id
+
+# 查看运行着的容器
+docker ps   
+# 查看本地所有的容器，包括不运行的 
+docker ps -a
+# 删除指定的容器，才能删除指定的镜像
+docker rm container_id
+# 删除所有的容器
+docker rm -f $(docker ps -aq)
+
+# 把docker的后台进程提到当前控制台显示
+docker attach container_name
+# 进入后台的进程
+docker exec -it container_id /bin/bash
+
+# copy容器中的内容到主机的home目录。
+docker copy container_id:/home/document.txt  /home
+
+
+# 停止容器
+exit
+# 退出但不停止
+Ctrl + p + q 
+# 导出容器
 docker export  container_id > test_container_id.tar
-// 导入容器
+# 导入容器
 cat test_container_id.tar | docker import - test/container_nm:tag_nm
 ````
 
@@ -167,16 +203,51 @@ docker run -d -P --name web -v /webapp demo/webapp python app.py
 挂载主机的/src/webapp到容器的/opt/webapp目录下面
 docker run -d -P --name myubuntu -v /data01:/data01 ubuntu
 
-容器间共享数据的方式(相当于共享磁片)
-1. 创建一个专用的容器，数据卷容器
-docker run -it -v /dbdata --name dbdata ubuntu
-2. 在其他容器中挂载该数据卷
-docker run -it --volumes-from dbdata --name myapp ubuntu
-3. 删除数据卷（只有所有的挂载容器都被删除后才能执行成功,无容器使用)
-docker rm -v dbdata
+
 ````
 
+### 容器数据卷功能
+
+```shell
+# 容器间共享数据的方式(相当于共享磁片)
+# 创建一个专用的容器，数据卷容器
+docker run -it -v /dbdata --name dbdata ubuntu
+docker run -it volume-from dbdata --name ubuntu2 ubuntu
+
+# 匿名挂载 （容器内的/etc/niginx 挂在到容器外的/etc/nginx)
+docker run -d -P --name nginx_01 -v /etc/nginx nginx
+# 具名挂载
+docker run -d -P --name nginx_01 -v mynginx:/etc/nginx:ro nginx
+docker run -d -P --name nginx_01 -v mynginx:/etc/nginx:rw nginx
+
+# 查看挂载的路径
+docker volume inspect mynginx
+
+# 查看容器的详细信息
+docker  container_id inspect
+
+# 在其他容器中挂载该数据卷
+docker run -it --volumes-from dbdata --name myapp ubuntu
+
+# 删除数据卷（只有所有的挂载容器都被删除后才能执行成功,无容器使用)
+docker rm -v dbdata
+
+# 查看数据卷的详细列表
+docker volume ls
+```
+
+## DockerFile管理
+
+```
+
+```
+
+
+
+
+
 ## Docker的网络功能
+
 ````
 绑定宿主机器的4001端口和容器的4001端口
 docker run -d -p 4001:4001 --name spring-boot-rest spring-boot-image
@@ -198,7 +269,7 @@ docker run -d --hostname myhostname -p 5671:5671 -p 5672:5672 -p 4369:4369 -p 25
 docker ps
 docker logs xxxx  (xxxx = ps find id)
 http://localhost:15672  guest/guest
-``` 
+```
 
 ## docker run options
 ```
@@ -228,3 +299,18 @@ http://localhost:15672  guest/guest
 -i：即使没有附加也保持STDIN 打开
 -t：分配一个伪终端
 ```
+
+# docker网络
+
+docker加速器
+
+```
+
+```
+
+
+
+```
+docker
+```
+

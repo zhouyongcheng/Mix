@@ -426,8 +426,18 @@ KafkaProducer.send(record, Callback() {}), 在callback中发送异常时显示�
 ### 消费者手动提交
 
 1. 配置enable.auto.commit = false   
+
 2. 同步手动提交
+
 3. 异步手动提交
+
+   消费者命令行提交偏移量
+
+   ```
+   ./kafka-consumer-groups.sh --bootstrap-server 172.18.67.59:9092,172.18.67.60:9092,172.18.67.61:9092 --group g_product_sell_out_trace --topic tp_product_sell_out_notification_trace --reset-offsets --to-latest --execute
+   ```
+
+   
 
 ### 消费者自定义存储offset的方式
 

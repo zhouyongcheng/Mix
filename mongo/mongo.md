@@ -1,4 +1,9 @@
 ## 为什么采用mongdb
+* 自动故障转移【副本集提供的功能基础】，读写分离，在副本上进行读取操作。
+* 水平扩展能力（基于mongodb的分片sharding功能）。
+* 数据模型比较直观（文档型数据结构）
+* 无需预先定义schema。
+* 能够在多台服务器上进行优雅的伸缩。
 * 横向扩展方便，这样可以增加存储空间及提升性能。
 * 采用文档数据模型，自动在多台服务器间分割数据。
 * 提供通用索引功能，多种快速查询方式。
@@ -7,16 +12,23 @@
 * 管理方便，管理理念，尽可能让服务器自动配置，用户在必要的时候调整设置。
 * 多数据库并存，数据库间完全独立（权限，存储位置等）
 * mongodb在插入数据的时候不会执行代码，所以不会有注入式攻击的风险。
-☐
+* 数据能在多个节点间进行复制(replica)。（系统提供的功能，开发无需参与）
+* 自动分片能力（横向扩展的能力，把数据分散到不同的分片，每个分片有多个复制，高可用性。）
+* 强一致性。
 
-## 注意事项
+## 注意事项（局限性）
+
+* 强依赖内存，所以必须运行在64位的机器上。
+* 运行在独占的服务器上。
 * mongodb不仅区分类型，而且还区分大小写（键及值）
 * 同一个文档中，不能有重复的键。
+* 不支持关联查询，只能在一个collection中查询。
 * 使用子集合的方式来组织数据是一种很好的方式（sellout.report, sellout.realtime)
 * admin数据库，把用户加到这个数据库，则该用户自动继承所有数据库的权限。
 * mongod.lock：这个文件的目的是防止其他mongod的进程使用当前进程的数据。
 * 使用64位的稳定版本的mongodb
-* 
+* 复制集没有主节点的概念？
+* 在开发时候选择非严格模式，生成环境上，选择严格模式。
 
 
 # 安装mongodb
@@ -64,9 +76,17 @@
 
 
 ## 常用命令
-```
+```properties
 mongo
->version()
+# 查看版本
+version()
+# 查看数据库的状态（分析数据）
+db.stats();
+db.runCommand({dbstats:1})
+# 查看某个集合的分析数据
+db.student.stats();
+db.runCommand({collstats: 'student'});
+
 > show dbs
 > use dbname
 > show collections
@@ -75,10 +95,15 @@ mongo
 >db.createCollection("audit", {capped:true, size: 20480})    -创建固定大小集合
 >db.createCollection("mycollec", {capped:true, size:100000, max:1000}); -- 限制记录条数
 >db.runCommand({convertToCapped: "test", size: 10000})  -- 把普通集合转换未固定集合
->db.audit.find().sort({$natural: -1}).limit(10)   --获取固定集合中的最后10条记录。
+# 获取固定集合中的最后10条记录。
+>db.audit.find().sort({$natural: -1}).limit(10)
+# 删除数据库
+use demo;
+db.dropDatabase();
 ```
 
-## mongo.conf example
+## 配置文件样例
+
 ```
 dbpath = /home/cmwin/data/db
 logpath = /home/cmwin/data/log
@@ -87,41 +112,79 @@ port = 5000
 auth = true
 ```
 
-## mongo client using
+## 客户端连接
 ```
 mongo --port 5000 --host 192.168.0.1 --username cmwin --password admin123 --authenticationDatabase admin
 
 ```
 
-## 数据库的备份操作(全库备份)
- > 执行完mongodump命令后,会在当前目录下创建dump目录,备份文件都存储在dump目录下.
- * mkdir ~/mongobak
- * cd ~/mongobak
- * ./mongodump
-
-##  备份单个数据库
-`./mongodump -d db_name`
-
-## 备份指定数据库下的指定集合
-`./mongodump -d db_name -c collection_name`
 
 
-## 恢复全部数据库的备份,
-> 注意切换到包含dump目录的路径下执行mongorestore命令
-   * cd ~/mongobak   
-   * mongorestore --drop    --drop参数指的是先删除,在导入,避免数据的重复.
+## 备份
 
-## 恢复单个数据库
-* mongorestore -d db_name --drop
+### 全库备份
 
-## 恢复指定数据库下的指定集合
-* mongorestore -d db_name -c collection_name --drop
+```shell
+# 执行完mongodump命令后,会在当前目录下创建dump目录,备份文件都存储在dump目录下.
+mkdir ~/mongobak
+cd ~/mongobak
+./mongodump
+```
+
+###  单数据库备份
+
+```shell
+./mongodump -d db_name
+```
+
+### 指定集合备份
+
+```shell
+./mongodump -d db_name -c collection_name
+```
 
 
-## export data from mongodb
+
+## 恢复
+
+### 全库恢复
+
+```shell
+# 注意切换到包含dump目录的路径下执行mongorestore命令
+cd ~/mongobak   # 该目录下包含dump目录
+mongorestore --drop 
+# --drop参数指的是先删除,在导入,避免数据的重复.
+```
+
+### 恢复数据库下的指定集合
+
+```shell
+mongorestore -d db_name -c collection_name --drop
+# 注意切换到包含dump目录的路径下执行mongorestore命令
+```
+
+## 导出CSV文件
+
+```shell
 export -d test -c todo -q {} -f _id,name,address --csv > test.todo.csv
+-d : 数据库名称
+-c : 集合名称
+-q ： 查询条件
+-f : 导出的字段。
+--csv ： 导出格式
+```
 
-## import data into mongodb(csv, tsv, json etc)
+
+
+## 导入csv文件
+
+```
+import xxx
+```
+
+周建
+
+
 
 # 数据库的安全管理
 ````
@@ -234,20 +297,22 @@ rest=true
 * db.fs.files.find()
 
 ## 索引功能(index)
-- db.posts.ensureIndex({Tags: 1})
-- db.posts.ensureIndex({Tags: -1})
-- db.posts.ensureIndex({"name":1, "age": -1})
-- db.posts.ensureIndex({"comments.count", 1})
-- db.posts.dropIndexes();
-- db.posts.dropIndex({"name": 1})
-- db.posts.ensureIndex({"name": 1}, {"unique": true})
-- db.posts.ensureIndex({"name": 1}, {"unique": true, "dropDups": true})
-- db.posts.ensureIndex({"name":1, "age": 1}, {"unique": true})
-- db.posts.reIndex();
-* db.blog.ensureIndex({body: 'text'})
-* db.blog.getIndexex();
 
-* db.blog.runCommand("text": {search: 'fish'});
+```json
+db.posts.ensureIndex({Tags: 1})
+db.posts.ensureIndex({Tags: -1})
+db.posts.ensureIndex({"name":1, "age": -1})
+db.posts.ensureIndex({"comments.count", 1})
+db.posts.ensureIndex({"name": 1}, {"unique": true})
+db.posts.ensureIndex({"name": 1}, {"unique": true, "dropDups": true})
+db.posts.ensureIndex({"name":1, "age": 1}, {"unique": true})
+db.posts.reIndex();
+db.blog.ensureIndex({body: 'text'})
+db.blog.getIndexex();
+db.blog.runCommand("text": {search: 'fish'});
+db.posts.dropIndexes();
+db.posts.dropIndex({"name": 1})
+```
 
 
 
