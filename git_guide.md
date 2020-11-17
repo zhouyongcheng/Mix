@@ -175,6 +175,10 @@ git checkout -b dev origin/dev
 git branch --set-upstream-to=origin/dev   
 # 远程没有分支的情况下。
 git push -u origin branch_name
+# 在另外的机器上执行和origin远程仓库获取最新的数据。
+get fetch
+# 本地分支和远程分支进行绑定。（把远程分支拉到本地来）。
+git checkout -b local_name origin/bname
 ```
 
 
