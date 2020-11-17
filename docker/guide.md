@@ -84,13 +84,50 @@ sudo systemctl restart docker
 
 
 
-### 获取mysql的image
+### docker安装mysql
 
-```
+```properties
 docker pull mysql:5.7
+docker run -itd --name mysql-mc -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql
+# 参数说明：
+-p 3306:3306 ：映射容器服务的 3306 端口到宿主机的 3306 端口，外部主机可以直接通过 宿主机ip:3306 访问到 MySQL 的服务。
+MYSQL_ROOT_PASSWORD=123456：设置 MySQL 服务 root 用户的密码。
+```
+
+### docker安装redis
+
+```properties
+docker pull redis:latest
+docker run -itd --name redis-mc -p 6379:6379 redis
+docker exec -it redis-mc /bin/bash
+```
+
+### docker安装mongodb
+
+```properties
+docker pull mongo:latest
+docker run -itd --name mongo-mc -p 27017:27017 mongo --auth
+# 参数说明：
+--auth：需要密码才能访问容器服务。
+docker exec -it mongo-mc mongo admin
+# 创建一个名为 admin，密码为 123456 的用户。
+db.createUser({ user:'admin',pwd:'123456',roles:[ { role:'userAdminAnyDatabase', db: 'admin'},"readWriteAnyDatabase"]});
+# 尝试使用上面创建的用户信息进行连接。
+ db.auth('admin', '123456')
 ```
 
 
+
+### 安装nginx
+
+```
+docker pull nginx:latest
+docker run --name nginx-mc -p 8080:80 -d nginx
+# 参数说明：
+-p 8080:80： 端口进行映射，将本地 8080 端口映射到容器内部的 80 端口。
+-d nginx： 设置容器在在后台一直运行。
+
+```
 
 ````
 docker pull registry.hub.docker.com/ubuntu:latest
