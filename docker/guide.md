@@ -137,7 +137,31 @@ docker pull ubuntu:latest
 docker pull ubuntu:14.04
 ````
 
+
+
+### 安装zookeeper
+
+```shell
+docker pull wurstmeister/zookeeper
+docker run -d --name zookeeper -p 2181:2181 -v /etc/localtime:/etc/localtime -t wurstmeister/zookeeper
+```
+
+安装kafka
+
+```
+docker pull wurstmeister/kafka
+docker run -d --name kafka --publish 9092:9092 --link zookeeper --env KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 --env KAFKA_ADVERTISED_HOST_NAME=172.16.10.181 --env KAFKA_ADVERTISED_PORT=9092 --volume /etc/localtime:/etc/localtime wurstmeister/kafka:latest
+
+# 进入kafka容器查看状态
+docker exec -it ${CONTAINER ID} /bin/bash
+
+172.16.10.181 改为宿主机器的IP地址，如果不这么设置，可能会导致在别的机器上访问不到kafka。
+```
+
+
+
 ## use image to create container
+
 ```shell
 docker create -it ubuntu             // create the container but at stop status
 -t :  pseudo-tty   terminal
