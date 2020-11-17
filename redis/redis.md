@@ -6,9 +6,6 @@
 
 [redis常用命令] (https://www.cnblogs.com/jtfr/p/10503803.html)
 
-<<<<<<< HEAD
-## 安装redis
-=======
 ## 安装Redis
 
 ### 环境准备
@@ -18,7 +15,7 @@
 yum -y install centos-release-scl
 yum -y install devtoolset-9-gcc devtoolset-9-gcc-c++ devtoolset-9-binutils
 echo "source /opt/rh/devtoolset-9/enable" >>/etc/profile
->>>>>>> aa68d12f6819143dd878da4d7fee9904aa1391c5
+
 ```
 
 ### 安装
@@ -333,4 +330,3 @@ public class RedisCacheConfig {
     }
 }
 ```
-

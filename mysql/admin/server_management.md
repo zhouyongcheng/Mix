@@ -5,10 +5,6 @@ mysql -uroot -p
 
 ```
 
-
-
-
-
 mysqls数据库服务的启动，停止，维护等都使用mysql用户进行。
 #groupadd -g 33201 mysql
 #useradd mysql -u 43201 -g mysql
@@ -140,6 +136,10 @@ grant select on mysql.user to cmwin@192.168.0.2;
 
 GRANT ALL PRIVILEGES ON cmwin.* TO 'root'@'%' IDENTIFIED BY 'cmwin@110!' WITH GRANT OPTION;
 
+GRANT ALL PRIVILEGES ON cmwin.* to 'root'@'%' IDENTIFIED BY 'cmwin@110!' WITH GRANT OPTION;
+
+
+
 #查看用户的授权
 show grants for 'cmwin'@'192.168.0.2';
 show grants;
@@ -148,10 +148,16 @@ show grants;
 revoke select on mysql.user from 'cmwin'@'192.168.0.1';
 revoke all privileges, grant options from user;
 
+## 修改用户命名
 
-set password for hw3ms4_mm=password('123456')
-set password=password('123456');  #修改当前用户的密码
-update mysql.user set password=password('123456') where user='cmwin' and host='%';
+```properties
+ # 修改加密规则
+ALTER USER 'cmwin'@'%' IDENTIFIED BY 'manager' PASSWORD EXPIRE NEVER;  
+#更新一下用户的密码 
+ALTER USER 'cmwin'@'%' IDENTIFIED WITH mysql_native_password BY 'manager'; 
+# 刷新权限 
+FLUSH PRIVILEGES;  
+```
 
 
 # 显示支持的字符集
