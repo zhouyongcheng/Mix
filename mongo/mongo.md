@@ -19,6 +19,10 @@
 * 
 
 
+## 常用命令
+
+
+
 # 安装mongodb
 
 * download and extract (linux | windows)
