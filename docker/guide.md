@@ -1,3 +1,5 @@
+[TOC]
+
 # spring cloud guide
 
 ## EurekaCenter: 8001
@@ -23,6 +25,7 @@ sudo yum remove docker \`
 ```
 
 ## 安装一些必要的系统工具：
+
 ```
 sudo yum install -y yum-utils device-mapper-persistent-data lvm2
 添加软件源信息：
@@ -81,13 +84,50 @@ sudo systemctl restart docker
 
 
 
-### 获取mysql的image
+### docker安装mysql
 
-```
+```properties
 docker pull mysql:5.7
+docker run -itd --name mysql-mc -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql
+# 参数说明：
+-p 3306:3306 ：映射容器服务的 3306 端口到宿主机的 3306 端口，外部主机可以直接通过 宿主机ip:3306 访问到 MySQL 的服务。
+MYSQL_ROOT_PASSWORD=123456：设置 MySQL 服务 root 用户的密码。
+```
+
+### docker安装redis
+
+```properties
+docker pull redis:latest
+docker run -itd --name redis-mc -p 6379:6379 redis
+docker exec -it redis-mc /bin/bash
+```
+
+### docker安装mongodb
+
+```properties
+docker pull mongo:latest
+docker run -itd --name mongo-mc -p 27017:27017 mongo --auth
+# 参数说明：
+--auth：需要密码才能访问容器服务。
+docker exec -it mongo-mc mongo admin
+# 创建一个名为 admin，密码为 123456 的用户。
+db.createUser({ user:'admin',pwd:'123456',roles:[ { role:'userAdminAnyDatabase', db: 'admin'},"readWriteAnyDatabase"]});
+# 尝试使用上面创建的用户信息进行连接。
+ db.auth('admin', '123456')
 ```
 
 
+
+### 安装nginx
+
+```
+docker pull nginx:latest
+docker run --name nginx-mc -p 8080:80 -d nginx
+# 参数说明：
+-p 8080:80： 端口进行映射，将本地 8080 端口映射到容器内部的 80 端口。
+-d nginx： 设置容器在在后台一直运行。
+
+```
 
 ````
 docker pull registry.hub.docker.com/ubuntu:latest
@@ -97,7 +137,31 @@ docker pull ubuntu:latest
 docker pull ubuntu:14.04
 ````
 
+
+
+### 安装zookeeper
+
+```shell
+docker pull wurstmeister/zookeeper
+docker run -d --name zookeeper -p 2181:2181 -v /etc/localtime:/etc/localtime -t wurstmeister/zookeeper
+```
+
+安装kafka
+
+```
+docker pull wurstmeister/kafka
+docker run -d --name kafka --publish 9092:9092 --link zookeeper --env KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 --env KAFKA_ADVERTISED_HOST_NAME=172.16.10.181 --env KAFKA_ADVERTISED_PORT=9092 --volume /etc/localtime:/etc/localtime wurstmeister/kafka:latest
+
+# 进入kafka容器查看状态
+docker exec -it ${CONTAINER ID} /bin/bash
+
+172.16.10.181 改为宿主机器的IP地址，如果不这么设置，可能会导致在别的机器上访问不到kafka。
+```
+
+
+
 ## use image to create container
+
 ```shell
 docker create -it ubuntu             // create the container but at stop status
 -t :  pseudo-tty   terminal
@@ -166,41 +230,74 @@ docker push image_name:[tag]
 
 
 
-## docker容器管理
-````
-创建容器并处于停止状态，启动容器
+## docker命令
+````properties
+docker version
+docker info
+# 搜镜像信息
+docker search
+docker pull tomcat:latest
+docker rmi id
+# 删除所有的images
+docker rmi -f $(docker images -aq)
+
+# 容器命令
+# 创建容器并处于停止状态，启动容器
 docker create -it image_id
 docker start container_id
 
 创建并同时启动容器,执行指定指令，centos代表的是image名
 docker run centos /bin/echo 'hello world'
+docker run -it centos /bin/bash
 
 如果一个容器已经停止，则必须用run方法进行启动
 docker run image
+--name ： 给容器起个名字
+-d     ： 后台进程
+-it    ：交换，启动后台
+-p     :  8080:8080 (主机端口：容器端口)
+
 以守护进程的方式运行容器
 docker run -d -p 4001:4001 --name spring-boot spring-boot-image
-查看守护进程的输出内容
+# 查看守护进程的输出内容
 docker logs container_id
-停止容器
+# 停止容器
 docker stop container_id
-查看处于终止状态的容器，并重新启动
+# 查看处于终止状态的容器，并重新启动
 docker ps -a -q
 docker start container_id
 docker restart container_id
-// 查看运行着的容器
-docker ps   
-// 查看本地所有的容器，包括不运行的 
-docker ps -a
-// 删除指定的容器，才能删除指定的镜像
-docker rm container_id
-// 进入后台的进程
-docker attach container_name
-docker exec -it container_id /bin/bash
-// 停止运行的容器
+# 停止运行的容器
 docker stop container_id
-// 导出容器
+docker kill container_id
+# 停止运行的容器
+docker stop container_id
+
+# 查看运行着的容器
+docker ps   
+# 查看本地所有的容器，包括不运行的 
+docker ps -a
+# 删除指定的容器，才能删除指定的镜像
+docker rm container_id
+# 删除所有的容器
+docker rm -f $(docker ps -aq)
+
+# 把docker的后台进程提到当前控制台显示
+docker attach container_name
+# 进入后台的进程
+docker exec -it container_id /bin/bash
+
+# copy容器中的内容到主机的home目录。
+docker copy container_id:/home/document.txt  /home
+
+
+# 停止容器
+exit
+# 退出但不停止
+Ctrl + p + q 
+# 导出容器
 docker export  container_id > test_container_id.tar
-// 导入容器
+# 导入容器
 cat test_container_id.tar | docker import - test/container_nm:tag_nm
 ````
 
@@ -213,16 +310,51 @@ docker run -d -P --name web -v /webapp demo/webapp python app.py
 挂载主机的/src/webapp到容器的/opt/webapp目录下面
 docker run -d -P --name myubuntu -v /data01:/data01 ubuntu
 
-容器间共享数据的方式(相当于共享磁片)
-1. 创建一个专用的容器，数据卷容器
-docker run -it -v /dbdata --name dbdata ubuntu
-2. 在其他容器中挂载该数据卷
-docker run -it --volumes-from dbdata --name myapp ubuntu
-3. 删除数据卷（只有所有的挂载容器都被删除后才能执行成功,无容器使用)
-docker rm -v dbdata
+
 ````
 
+### 容器数据卷功能
+
+```shell
+# 容器间共享数据的方式(相当于共享磁片)
+# 创建一个专用的容器，数据卷容器
+docker run -it -v /dbdata --name dbdata ubuntu
+docker run -it volume-from dbdata --name ubuntu2 ubuntu
+
+# 匿名挂载 （容器内的/etc/niginx 挂在到容器外的/etc/nginx)
+docker run -d -P --name nginx_01 -v /etc/nginx nginx
+# 具名挂载
+docker run -d -P --name nginx_01 -v mynginx:/etc/nginx:ro nginx
+docker run -d -P --name nginx_01 -v mynginx:/etc/nginx:rw nginx
+
+# 查看挂载的路径
+docker volume inspect mynginx
+
+# 查看容器的详细信息
+docker  container_id inspect
+
+# 在其他容器中挂载该数据卷
+docker run -it --volumes-from dbdata --name myapp ubuntu
+
+# 删除数据卷（只有所有的挂载容器都被删除后才能执行成功,无容器使用)
+docker rm -v dbdata
+
+# 查看数据卷的详细列表
+docker volume ls
+```
+
+## DockerFile管理
+
+```
+
+```
+
+
+
+
+
 ## Docker的网络功能
+
 ````
 绑定宿主机器的4001端口和容器的4001端口
 docker run -d -p 4001:4001 --name spring-boot-rest spring-boot-image
@@ -274,3 +406,19 @@ http://localhost:15672  guest/guest
 -i：即使没有附加也保持STDIN 打开
 -t：分配一个伪终端
 ```
+
+# docker网络
+
+### docker加速器
+
+```
+
+```
+
+### docker常用网络命令
+
+```
+docker network ls
+docker network connect
+```
+

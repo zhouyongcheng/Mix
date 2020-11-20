@@ -35,3 +35,9 @@ git rm --cached file_name
 
 
 
+netstat -ano | findstr 端口号
+
+taskkill -PID 进程号 -F
+
+
+

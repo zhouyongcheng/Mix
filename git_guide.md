@@ -30,13 +30,12 @@
 ```
 
 ## 保存git的密码
+
+```
 git config --global credential.helper store
 git config --global user.name "username"
 git config --global user.email "xxx.mail"
-
-
-
-
+```
 
 ## svn 导出纯代码
 
@@ -55,22 +54,10 @@ git config --global user.email "xxx.mail"
 ```
 
 
-## 把本地文件导入到maven仓库,避免从远程仓库导入
+## 把本地文件导入到maven仓库
 ```
 mvn install:install-file -Dfile=~/data/soft/flink-1.10.0/lib/flink-table_2.12-1.10.0.jar -DgroupId=org.apache.flink -DartifactId=flink-table_2.12 -Dversion=1.10.0 -Dpackaging=jar
 ```
-
-
-
-<!-- https://mvnrepository.com/artifact/org.apache.flink/flink-table -->
-<dependency>
-    <groupId>org.apache.flink</groupId>
-    <artifactId>flink-table_2.11</artifactId>
-    <version>1.7.2</version>
-    <scope>provided</scope>
-</dependency>
-
-
 
 
 
@@ -129,18 +116,19 @@ $ git init --bare cmwin.git
 $ chown -R git:git cmwin.git
 ```
 
-##克隆仓库
-```
-$ git clone git@192.168.3.5:/home/git/gitrepo/cmwin.git
-```
--- 把本地的git仓库和远程的仓库进行关联。
-git remote add origin git@github.com:michaelliao/learngit.git 
--- 把本地的分支推送到远程分支，并进行关联。(第一次关联的时候)
-git push -u origin master
--- 只推送
-git push origin master
+### 远程仓库管理
 
--- 如果从零开始开发，先建立远程仓库，然后在本地进行clone。
+```properties
+# clone远程仓库
+$ git clone git@192.168.3.5:/home/git/gitrepo/cmwin.git
+# 把本地的git仓库和远程的仓库进行关联。 origin可以理解成为远程仓库创建个别名。
+git remote add origin git@github.com:michaelliao/learngit.git
+# 把本地的分支推送到远程分支，并进行关联。(第一次关联的时候)
+git push -u origin master
+# 只推送
+git push origin master
+```
+### 
 
 ## git的分支管理
 ```
@@ -154,6 +142,7 @@ git push origin master
 ## dev分支
 在dev分支上进行开发，最后合并到master分支。
 新功能在future分支上进行开发，最后合并到master分支
+
 * master分支是主分支，因此要时刻与远程同步；
 * dev分支是开发分支，团队所有成员都需要在上面工作，所以也需要与远程同步；
 * bug分支只用于在本地修复bug没必要推到远程;
@@ -163,15 +152,37 @@ git push origin master
 ```
 分支修改内容合并到主分支
 ```
-* 查看分支：git branch
-* 创建分支：git branch <name>
-* 切换分支：git checkout <name>
-* 创建+切换分支：git checkout -b <name>
-* 合并某分支到当前分支：git merge <name>
-* 删除分支：git branch -d <name>
-* 强行删除分支： git branch -D feature-vulcan  （丢弃一个没有被合并过的分支）
-* 创建本地dev分支和远程dev分支绑定 git checkout -b dev origin/dev
-* 建立本地分支和远程分支的关联 git branch --set-upstream-to=origin/dev dev   
+### 分支管理
+
+```properties
+# 查看分支
+git branch
+# 创建分支
+git branch <name>
+# 切换分支
+git checkout <name>
+# 创建+切换分支
+git checkout -b <name>
+# 合并某分支到当前分支：
+git merge <name>
+# 删除分支
+git branch -d <name>
+# 强行删除分支： 
+git branch -D feature-vulcan  （丢弃一个没有被合并过的分支）
+# 创建本地dev分支和远程dev分支绑定 
+git checkout -b dev origin/dev
+# 建立本地分支和远程分支的关联，远程已经存在dev分支的情况下。 
+git branch --set-upstream-to=origin/dev   
+# 远程没有分支的情况下。
+git push -u origin branch_name
+# 在另外的机器上执行和origin远程仓库获取最新的数据。
+get fetch
+# 本地分支和远程分支进行绑定。（把远程分支拉到本地来）。
+git checkout -b local_name origin/bname
+```
+
+
+
 * git log --graph --pretty=oneline --abbrev-commit
 
 ## 分支管理策略
@@ -204,13 +215,7 @@ git archive --format zip --output "../master.zip" master -0
 git archive --format zip --output "../output.zip" master -0
 ```
 
-
  git clone git@10.67.31.48:/home/git/mcrepo.git
-  git clone git@10.67.31.48:/home/git/msgcenter.git
-
-
-threadpool.bulk.type: fixed
-threadpool.bulk.size: 8
-threadpool.bulk.queue_size: 1000
+ git clone git@10.67.31.48:/home/git/msgcenter.git
 
 git remote add origin git@192.168.101.14:/home/git/gitrepo/mcproj.git

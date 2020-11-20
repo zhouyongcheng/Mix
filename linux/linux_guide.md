@@ -1,3 +1,10 @@
+## windows杀进程
+
+```powershell
+netstat -ano | findstr 端口号
+taskkill -PID 进程号 -F
+```
+
 安装FinalShell
 
 ```shell

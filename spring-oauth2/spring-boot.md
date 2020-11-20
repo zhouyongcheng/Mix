@@ -61,6 +61,22 @@ public class TransactionAdviceConfig {
 
 
 
+## springboot中属性文件使用
+
+```java
+@Component
+@PropertySource("classpath:my.properties")
+@ConfigurationProperties(prefix = "user")
+public class MyConfig {
+    private String username;
+    private String password;
+}
+
+# my.properties
+user.username=demo
+user.password=123456    
+```
+
 
 
 

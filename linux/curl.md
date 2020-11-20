@@ -21,6 +21,10 @@ T_D_STORE_SELL_OUT_WHITELIST
 curl "http://localhost:8070/datasync/view2" &
 
 
+curl "http://localhost:8070/datasync/stopGenSellOut" &
+
+
+
 select * from mcsell.t_b_task_active_table tbtat ;
 select count(*) from mcsell.t_d_product_sell_out_task;
 select count(*) from mcsell.t_d_product_sell_out_task_1;
@@ -38,3 +42,6 @@ http://localhost/jobhandler/databaseAvailability
 
 数据库恢复正常后，恢复各个消费者。
 http://localhost/jobhandler/recoveryConsumer
+
+用户的品牌及访问菜单
+http://localhost/jobhandler/userBrand
