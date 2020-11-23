@@ -88,18 +88,25 @@ sudo systemctl restart docker
 
 ```properties
 docker pull mysql:5.7
-docker run -itd --name mysql-mc -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql
+docker run --name my-mysql -p 3306:3306 -d --privileged -v /data/mysql_data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 mysql:5.7
 # 参数说明：
--p 3306:3306 ：映射容器服务的 3306 端口到宿主机的 3306 端口，外部主机可以直接通过 宿主机ip:3306 访问到 MySQL 的服务。
-MYSQL_ROOT_PASSWORD=123456：设置 MySQL 服务 root 用户的密码。
+	#映射容器服务的 3306 端口到宿主机的 3306 端口，外部主机可以直接通过 宿主机ip:3306
+	-p 3306:3306
+	# 设置MySQL服务root用户的密码。
+	MYSQL_ROOT_PASSWORD=123456
 ```
 
 ### docker安装redis
 
 ```properties
 docker pull redis:latest
-docker run -itd --name redis-mc -p 6379:6379 redis
-docker exec -it redis-mc /bin/bash
+# 启动容器
+docker run --name my-redis -p 6379:6379 -d --privileged -v /data/redis_data:/data redis redis-server --appendonly yes
+# 参数：
+    # 容器内执行redis-server命令，并打开持久化
+	redis-server --appendonly yes 
+# 进入容器调用客户端进行验证。
+docker exec -it my-redis /bin/bash
 ```
 
 ### docker安装mongodb
@@ -115,8 +122,6 @@ db.createUser({ user:'admin',pwd:'123456',roles:[ { role:'userAdminAnyDatabase',
 # 尝试使用上面创建的用户信息进行连接。
  db.auth('admin', '123456')
 ```
-
-
 
 ### 安装nginx
 
@@ -144,9 +149,57 @@ docker pull ubuntu:14.04
 ```shell
 docker pull wurstmeister/zookeeper
 docker run -d --name zookeeper -p 2181:2181 -v /etc/localtime:/etc/localtime -t wurstmeister/zookeeper
+
+docker run -d --name zookeeper -p 2181:2181 -v /etc/localtime:/etc/localtime -t zookeeper
+
 ```
 
-安装kafka
+### docker本地集群安装zookeeper
+
+```shell
+# 获取官方版本的zookeeper
+docker pull zookeeper:latest
+
+# 创建自己的bridge网络，创建容器的时候指定ip
+docker network create --driver bridge --subnet=172.18.0.0/16 --gateway=172.18.0.1 zoonet
+
+# 创建容器node1
+docker run -d -p 2181:2181 --name zookeeper_node1 --privileged --restart always --network zoonet --ip 172.18.0.2 \
+-v /usr/local/zookeeper-cluster/node1/volumes/data:/data \
+-v /usr/local/zookeeper-cluster/node1/volumes/datalog:/datalog \
+-v /usr/local/zookeeper-cluster/node1/volumes/logs:/logs \
+-e ZOO_MY_ID=1 \
+-e "ZOO_SERVERS=server.1=172.18.0.2:2888:3888;2181 server.2=172.18.0.3:2888:3888;2181 server.3=172.18.0.4:2888:3888;2181" zookeeper
+
+# 创建容器node2
+docker run -d -p 2182:2181 --name zookeeper_node2 --privileged --restart always --network zoonet --ip 172.18.0.3 \
+-v /usr/local/zookeeper-cluster/node2/volumes/data:/data \
+-v /usr/local/zookeeper-cluster/node2/volumes/datalog:/datalog \
+-v /usr/local/zookeeper-cluster/node2/volumes/logs:/logs \
+-e ZOO_MY_ID=2 \
+-e "ZOO_SERVERS=server.1=172.18.0.2:2888:3888;2181 server.2=172.18.0.3:2888:3888;2181 server.3=172.18.0.4:2888:3888;2181" zookeeper
+
+# 创建容器node2
+docker run -d -p 2183:2181 --name zookeeper_node3 --privileged --restart always --network zoonet --ip 172.18.0.4 \
+-v /usr/local/zookeeper-cluster/node3/volumes/data:/data \
+-v /usr/local/zookeeper-cluster/node3/volumes/datalog:/datalog \
+-v /usr/local/zookeeper-cluster/node3/volumes/logs:/logs \
+-e ZOO_MY_ID=3 \
+-e "ZOO_SERVERS=server.1=172.18.0.2:2888:3888;2181 server.2=172.18.0.3:2888:3888;2181 server.3=172.18.0.4:2888:3888;2181" zookeeper
+
+# 进入容器验证下
+docker exec -it zookeeper_node01 bash
+bin/zkServer.sh status
+
+# 开启防火墙
+firewall-cmd --zone=public --add-port=2181/tcp --permanent
+firewall-cmd --zone=public --add-port=2182/tcp --permanent
+firewall-cmd --zone=public --add-port=2183/tcp --permanent
+systemctl restart firewalld
+firewall-cmd --list-all
+```
+
+### 安装kafka
 
 ```
 docker pull wurstmeister/kafka
@@ -156,6 +209,12 @@ docker run -d --name kafka --publish 9092:9092 --link zookeeper --env KAFKA_ZOOK
 docker exec -it ${CONTAINER ID} /bin/bash
 
 172.16.10.181 改为宿主机器的IP地址，如果不这么设置，可能会导致在别的机器上访问不到kafka。
+```
+
+### springboot应用安装到docker运行
+
+```
+
 ```
 
 
@@ -421,4 +480,6 @@ http://localhost:15672  guest/guest
 docker network ls
 docker network connect
 ```
+
+
 
