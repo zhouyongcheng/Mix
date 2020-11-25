@@ -61,7 +61,9 @@ public class TransactionAdviceConfig {
 
 
 
-## springboot中属性文件使用
+## springboot配置
+
+### 	独立的配置文件方式
 
 ```java
 @Component
@@ -75,6 +77,34 @@ public class MyConfig {
 # my.properties
 user.username=demo
 user.password=123456    
+```
+
+### 在application配置文件中配置
+
+```java
+@Data
+@Component
+@ConfigurationProperties(prefix = "zookeeper")
+public class ZookeeperConfigurer {
+    /** 尝试次数 */
+    private int retryCount;
+
+    /** 重试间隔时间 */
+    private int elapsedTimeMs;
+
+    /** session超时时间 */
+    private int sessionTimeoutMs;
+
+    /** 连接超时时间 */
+    private int connectionTimeoutMs;
+
+    /** zookeeper集群地址 */
+    private String servers;
+
+    /** zookeeper分布式锁跟路径 */
+    private String lockPath;
+}
+
 ```
 
 

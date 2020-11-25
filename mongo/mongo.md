@@ -31,6 +31,10 @@
 * 在开发时候选择非严格模式，生成环境上，选择严格模式。
 
 
+## 常用命令
+
+
+
 # 安装mongodb
 
 * download and extract (linux | windows)
