@@ -29,6 +29,21 @@
 </repositories>  
 ```
 
+## git打标签
+
+```shell
+# 查看tag列表
+git tag
+
+# -a 参数：创建带注解的标签
+git tag -a v1.9.3 
+
+# 推送tag到远程仓库
+git push origin v1.9.3
+```
+
+
+
 ## 保存git的密码
 
 ```
