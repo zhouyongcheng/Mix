@@ -59,8 +59,6 @@ public class TransactionAdviceConfig {
 }
 ```
 
-
-
 ## springboot配置
 
 ### 	独立的配置文件方式
