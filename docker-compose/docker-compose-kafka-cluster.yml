@@ -1,0 +1,112 @@
+version: '3.7'
+
+networks:
+  zoonet:
+    external: true
+
+services:
+
+  kafka1:
+    image: wurstmeister/kafka
+    restart: unless-stopped
+    container_name: kafka1
+    hostname: kafka1
+    privileged: true
+    ports:
+      - "9093:9092"
+      - "9999:9999"
+    external_links:
+      - zoo1
+      - zoo2
+      - zoo3
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ADVERTISED_HOST_NAME: 192.168.101.4                   ## 修改:宿主机IP
+      KAFKA_ADVERTISED_PORT: 9093                                 ## 修改:宿主机映射port
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://192.168.101.4:9093         ## 绑定发布订阅的端口。修改:宿主机IP
+      KAFKA_ZOOKEEPER_CONNECT: "zoo1:2181,zoo2:2181,zoo3:2181"
+      JMX_PORT: 9999
+    #  KAFKA_JMX_OPTS: "-Djava.rmi.server.hostname=192.168.101.4 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
+    volumes:
+      - "./kafka/kafka1/docker.sock:/var/run/docker.sock"
+      - "./kafka/kafka1/data/:/kafka"
+    networks:
+      - zoonet
+
+
+  kafka2:
+    image: wurstmeister/kafka
+    restart: unless-stopped
+    container_name: kafka2
+    hostname: kafka2
+    privileged: true
+    ports:
+      - "9094:9092"
+      - "9988:9988"
+    external_links:
+      - zoo1
+      - zoo2
+      - zoo3
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ADVERTISED_HOST_NAME: 192.168.101.4                  ## 修改:宿主机IP
+      KAFKA_ADVERTISED_PORT: 9094                               ## 修改:宿主机映射port
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://192.168.101.4:9094   ## 修改:宿主机IP
+      KAFKA_ZOOKEEPER_CONNECT: "zoo1:2181,zoo2:2181,zoo3:2181"
+      JMX_PORT: 9988
+    volumes:
+      - "./kafka/kafka2/docker.sock:/var/run/docker.sock"
+      - "./kafka/kafka2/data/:/kafka"
+    networks:
+      - zoonet
+
+  kafka3:
+    image: wurstmeister/kafka
+    restart: unless-stopped
+    container_name: kafka3
+    hostname: kafka3
+    privileged: true
+    ports:
+      - "9095:9092"
+      - "9977:9977"
+    external_links:
+      - zoo1
+      - zoo2
+      - zoo3
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ADVERTISED_HOST_NAME: 192.168.101.4                 ## 修改:宿主机IP
+      KAFKA_ADVERTISED_PORT: 9095                              ## 修改:宿主机映射port
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://192.168.101.4:9095   ## 修改:宿主机IP
+      KAFKA_ZOOKEEPER_CONNECT: "zoo1:2181,zoo2:2181,zoo3:2181"
+      JMX_PORT: 9977
+    volumes:
+      - "./kafka/kafka3/docker.sock:/var/run/docker.sock"
+      - "./kafka/kafka3/data/:/kafka"
+    networks:
+      - zoonet
+
+  kafka-manager:
+    image: sheepkiller/kafka-manager:latest
+    restart: unless-stopped
+    container_name: kafka-manager
+    hostname: kafka-manager
+    ports:
+      - "9000:9000"
+    links:            # 连接本compose文件创建的container
+      - kafka1
+      - kafka2
+      - kafka3
+    external_links:   # 连接本compose文件以外的container
+      - zoo1
+      - zoo2
+      - zoo3
+    environment:
+      ZK_HOSTS: 192.168.101.4:2182,192.168.101.4:2183,191.168.101.4:2184 
+      APPLICATION_SECRET: letmein
+      KAFKA_BROKERS: kafka1:9092,kafka2:9092,kafka3:9092
+      KM_ARGS: -Djava.net.preferIPv4Stack=true
+      # TZ: CST-8dd
+    networks:
+      - zoonet
+
