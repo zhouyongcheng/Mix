@@ -56,6 +56,19 @@ https://www.cnblogs.com/wushuaishuai/p/9984210.html
 
 
 
+## docker idea集成
+
+```properties
+# 编辑docker服务参数
+vim /lib/systemc/system/docker.service
+
+# 添加-H tcp://0.0.0.0:2375
+ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:2375 --containerd=/run/containerd/containerd.sock
+
+```
+
+
+
 ## 配置 Docker 镜像加速
 
 ```properties
@@ -117,6 +130,257 @@ docker run --name my-redis -p 6379:6379 -d --privileged -v /data/redis_data:/dat
 # 进入容器调用客户端进行验证。
 docker exec -it my-redis /bin/bash
 ```
+
+
+
+### docker安装redis-cluster
+
+#### IP和端口规划
+
+| ip            | port |
+| ------------- | ---- |
+| 172.16.10.243 | 7001 |
+| 172.16.10.243 | 7002 |
+| 172.16.10.243 | 7003 |
+| 172.16.10.243 | 7004 |
+| 172.16.10.243 | 7005 |
+| 172.16.10.243 | 7006 |
+
+#### 模板配置文件
+
+```properties
+# 文件名： ./redis-cluster.tmpl
+#------------------------------------------------
+
+# redis端口
+port ${PORT}
+# 关闭保护模式
+protected-mode no
+# 开启集群
+cluster-enabled yes
+# 集群节点配置
+cluster-config-file nodes.conf
+# 超时
+cluster-node-timeout 5000
+# 集群节点IP host模式为宿主机IP
+cluster-announce-ip 172.26.10.243
+# 集群节点端口 7001 - 7006
+cluster-announce-port ${PORT}
+cluster-announce-bus-port 1${PORT}
+# 开启 appendonly 备份模式
+appendonly yes
+# 每秒钟备份
+appendfsync everysec
+# 对aof文件进行压缩时，是否执行同步操作
+no-appendfsync-on-rewrite no
+# 当目前aof文件大小超过上一次重写时的aof文件大小的100%时会再次进行重写
+auto-aof-rewrite-percentage 100
+# 重写前AOF文件的大小最小值 默认 64mb
+auto-aof-rewrite-min-size 64mb
+```
+
+#### docker-compose配置
+
+```yaml
+version: '3.7'
+
+services:
+  redis7001:
+    image: 'redis'
+    container_name: redis7001
+    command:
+      ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    volumes:
+      - ./redis-cluster/7001/conf/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./redis-cluster/7001/data:/data
+    ports:
+      - "7001:7001"
+      - "17001:17001"
+    environment:
+      # 设置时区为上海，否则时间会有问题
+      - TZ=Asia/Shanghai
+
+
+  redis7002:
+    image: 'redis'
+    container_name: redis7002
+    command:
+      ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    volumes:
+      - ./redis-cluster/7002/conf/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./redis-cluster/7002/data:/data
+    ports:
+      - "7002:7002"
+      - "17002:17002"
+    environment:
+      # 设置时区为上海，否则时间会有问题
+      - TZ=Asia/Shanghai
+
+
+  redis7003:
+    image: 'redis'
+    container_name: redis7003
+    command:
+      ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    volumes:
+      - ./redis-cluster/7003/conf/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./redis-cluster/7003/data:/data
+    ports:
+      - "7003:7003"
+      - "17003:17003"
+    environment:
+      # 设置时区为上海，否则时间会有问题
+      - TZ=Asia/Shanghai
+
+
+  redis7004:
+    image: 'redis'
+    container_name: redis7004
+    command:
+      ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    volumes:
+      - ./redis-cluster/7004/conf/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./redis-cluster/7004/data:/data
+    ports:
+      - "7004:7004"
+      - "17004:17004"
+    environment:
+      # 设置时区为上海，否则时间会有问题
+      - TZ=Asia/Shanghai
+
+
+  redis7005:
+    image: 'redis'
+    container_name: redis7005
+    command:
+      ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    volumes:
+      - ./redis-cluster/7005/conf/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./redis-cluster/7005/data:/data
+    ports:
+      - "7005:7005"
+      - "17005:17005"
+    environment:
+      # 设置时区为上海，否则时间会有问题
+      - TZ=Asia/Shanghai
+
+
+  redis7006:
+    image: 'redis'
+    container_name: redis7006
+    command:
+      ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    volumes:
+      - ./redis-cluster/7006/conf/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./redis-cluster/7006/data:/data
+    ports:
+      - "7006:7006"
+      - "17006:17006"
+    environment:
+      # 设置时区为上海，否则时间会有问题
+      - TZ=Asia/Shanghai
+```
+
+#### 批量生成配置文件
+
+```shell
+# 文件名 ./redis-cluster-config.sh
+#------------------------------------------------
+
+#!/bin/bash
+for port in `seq 7001 7006`; do \
+  mkdir -p ./redis-cluster/${port}/conf \
+  && PORT=${port} envsubst < ./redis-cluster.tmpl > ./redis-cluster/${port}/conf/redis.conf \
+  && mkdir -p ./redis-cluster/${port}/data; \
+done
+```
+
+#### 集群配置
+
+```shell
+# 测试环境，没有密码限制
+docker exec -it redis7001 redis-cli -p 7001 --cluster create 172.16.10.243:7001 172.16.10.243:7002 172.16.10.243:7003 172.16.10.243:7004 172.16.10.243:7005 172.16.10.243:7006 --cluster-replicas 1
+```
+
+#### 集群测试
+
+```shell
+# 主节点和备份节点的ping通性
+docker exec -it redis7001 redis-cli -h 172.16.10.243 -p 7005 ping
+
+# 必须带上-c参数，否则会报错 (error) MOVED 5798 172.16.10.243:7002
+docker exec -it redis7001 redis-cli -h 172.16.10.243 -p 7003 -c
+
+#  查看集群状态
+cluster nodes
+
+# 查看slots分片
+cluster slots
+
+# 查看集群信息
+cluster info
+```
+
+#### Springboot配置Redis集群
+
+1. maven依赖
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-pool2</artifactId>
+</dependency>
+```
+
+2. application.yml配置
+
+```yaml
+spring:
+  redis:
+    timeout: 6000
+    password: 123456
+    cluster:
+      max-redirects: 3 # 获取失败 最大重定向次数 
+      nodes:
+        - 172.16.10.243:7001
+        - 172.16.10.243:7002
+        - 172.16.10.243:7003
+        - 172.16.10.243:7004
+        - 172.16.10.243:7005
+        - 172.16.10.243:7006
+    lettuce:
+      pool:
+        max-active: 1000 #连接池最大连接数（使用负值表示没有限制）
+        max-idle: 10 # 连接池中的最大空闲连接
+        min-idle: 5 # 连接池中的最小空闲连接
+        max-wait: -1 # 连接池最大阻塞等待时间（使用负值表示没有限制）
+  cache:
+    jcache:
+      config: classpath:ehcache.xml
+```
+
+3. java配置
+
+```java
+@Configuration
+@AutoConfigureAfter(RedisAutoConfiguration.class)
+public class RedisConfig {
+    @Bean
+    public RedisTemplate<String, Object> redisCacheTemplate(LettuceConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        template.setConnectionFactory(redisConnectionFactory);
+        return template;
+    }
+}
+```
+
+
 
 ### docker安装mongodb
 
