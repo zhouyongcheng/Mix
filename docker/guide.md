@@ -82,6 +82,15 @@ sudo systemctl restart docker
 
 
 
+## docker compose安装
+
+```
+# 获取脚本
+$ curl -L https://github.com/docker/compose/releases/download/1.27.4/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+# 赋予执行权限
+$chmod +x /usr/local/bin/docker-compose
+```
+
 
 
 ### docker安装mysql
@@ -150,7 +159,7 @@ docker pull ubuntu:14.04
 docker pull wurstmeister/zookeeper
 docker run -d --name zookeeper -p 2181:2181 -v /etc/localtime:/etc/localtime -t wurstmeister/zookeeper
 
-docker run -d --name zookeeper -p 2181:2181 -v /etc/localtime:/etc/localtime -t zookeeper
+docker run -d --name my-zookeeper -p 2181:2181 -v /etc/localtime:/etc/localtime -t zookeeper
 
 ```
 
@@ -203,7 +212,7 @@ firewall-cmd --list-all
 
 ```
 docker pull wurstmeister/kafka
-docker run -d --name kafka --publish 9092:9092 --link zookeeper --env KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 --env KAFKA_ADVERTISED_HOST_NAME=172.16.10.181 --env KAFKA_ADVERTISED_PORT=9092 --volume /etc/localtime:/etc/localtime wurstmeister/kafka:latest
+docker run -d --name my-kafka -p 9092:9092 --link my-zookeeper --env KAFKA_ZOOKEEPER_CONNECT=my-zookeeper:2181 --env KAFKA_ADVERTISED_HOST_NAME=127.0.0.1 --env KAFKA_ADVERTISED_PORT=9092 --volume /etc/localtime:/etc/localtime wurstmeister/kafka:latest
 
 # 进入kafka容器查看状态
 docker exec -it ${CONTAINER ID} /bin/bash

@@ -236,3 +236,13 @@ showmount -e 172.20.193.33
 
 mount -t nfs 172.25.216.21:/data /data
 ```
+
+
+
+## ubuntu 网络管理
+
+```shell
+# ubuntu重启网络
+sudo service network-manager restart
+```
+

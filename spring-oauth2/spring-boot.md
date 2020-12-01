@@ -61,6 +61,50 @@ public class TransactionAdviceConfig {
 
 
 
+### swagger配置
+
+#### 依赖包 
+
+```xml
+<dependency>
+	<groupId>io.springfox</groupId>
+	<artifactId>springfox-boot-starter</artifactId>
+	<version>3.0.0</version>
+</dependency>
+```
+
+#### java配置
+
+```java
+@Configuration
+@EnableOpenApi
+public class SwaggerConfig {
+
+    @Bean
+    public Docket api() {
+        return new Docket(DocumentationType.OAS_30)
+                .apiInfo(apiInfo())
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("cn.cmwin.amy.demo.controller"))
+                .paths(PathSelectors.any())
+                .build();
+    }
+
+    private ApiInfo apiInfo() {
+        return new ApiInfoBuilder()
+                .title("基于Swagger3.0.0的接口文档")
+                .description("api信息列表")
+                .version("2.0")
+                .contact(new Contact("cmwin", "http://www.baidu.com", "123456@qq.com"))
+                .build();
+    }
+}
+```
+
+
+
+
+
 ## springboot配置
 
 ### 	独立的配置文件方式
