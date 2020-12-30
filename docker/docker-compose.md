@@ -89,12 +89,14 @@ services:
 ```shell
 # 启动容器
 docker-compose -f docker-compose-zookeeper-cluster.yml up -d
-docker-compose -f docker-compose-kafka-cluster.yml stop
-docker docker exec -it zoo1 /bin/sh
-zkServer.sh status 
+docker-compose -f docker-compose-zookeeper-cluster.yml stop
+docker rm zoo1 zoo2 zoo3
 
+docker-compose -f docker-compose-kafka-cluster.yml up -d
 docker-compose -f docker-compose-kafka-cluster.yml stop
 docker rm kafka1 kafka2 kafka3 kafka-manager
-docker-compose -f docker-compose-kafka-cluster.yml up -d
+
+privileged: true
+
 ```
 

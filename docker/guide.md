@@ -131,6 +131,18 @@ docker run --name my-redis -p 6379:6379 -d --privileged -v /data/redis_data:/dat
 docker exec -it my-redis /bin/bash
 ```
 
+安装mongodb
+
+```
+docker run --name mc-mongo -p 27017:27017 -v /data/db:/data/db -d mongo:latest
+docker exec -it 容器id /bin/bash
+
+mongo
+use admin
+db.createUser({user:"root",pwd:"root",roles:[{role:'root',db:'admin'}]})   //创建用户,此用户创建成功,则后续操作都需要用户认证
+exit
+```
+
 
 
 ### docker安装redis-cluster
@@ -483,6 +495,18 @@ docker exec -it ${CONTAINER ID} /bin/bash
 
 172.16.10.181 改为宿主机器的IP地址，如果不这么设置，可能会导致在别的机器上访问不到kafka。
 ```
+
+## install prometheus
+
+```
+docker run -d \
+    -p 9090:9090 \
+    -v /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml \
+    -name mc-prometheus \
+    prom/prometheus
+```
+
+
 
 ### springboot应用安装到docker运行
 

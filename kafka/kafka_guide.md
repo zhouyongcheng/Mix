@@ -86,6 +86,15 @@ kafka消息采用二进制来保存，但仍然是结构化的数据。便于消
 ```
 
 # kafka常用命令
+
+## 查看kafka版本
+
+```
+手枪
+```
+
+
+
 ## 创建topic
 ```
 bin/kafka-topics.sh --create --zookeeper localhost:2181 --topic cdn-log --replication-factor 1 --partitions 1 
