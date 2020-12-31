@@ -386,14 +386,14 @@ public class RedisConfig {
 
 ```properties
 docker pull mongo:latest
-docker run -itd --name mongo-mc -p 27017:27017 mongo --auth
+docker run -itd --name mongo-mc -p 27017:27017 mongo  --auth
 # 参数说明：
 --auth：需要密码才能访问容器服务。
 docker exec -it mongo-mc mongo admin
 # 创建一个名为 admin，密码为 123456 的用户。
 db.createUser({ user:'admin',pwd:'123456',roles:[ { role:'userAdminAnyDatabase', db: 'admin'},"readWriteAnyDatabase"]});
 # 尝试使用上面创建的用户信息进行连接。
- db.auth('admin', '123456')
+db.auth('admin', '123456')
 ```
 
 ### 安装nginx
@@ -483,6 +483,22 @@ docker exec -it ${CONTAINER ID} /bin/bash
 
 172.16.10.181 改为宿主机器的IP地址，如果不这么设置，可能会导致在别的机器上访问不到kafka。
 ```
+
+
+
+### 安装consul
+
+```
+docker pull consul
+docker run --name mc-consul -d -p 8500:8500 consul
+
+
+cmwin-OptiPlex-3040
+```
+
+
+
+
 
 ### springboot应用安装到docker运行
 

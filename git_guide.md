@@ -52,6 +52,8 @@ git config --global user.name "username"
 git config --global user.email "xxx.mail"
 ```
 
+
+
 ## svn 导出纯代码
 
 1. 拷贝svn的项目,放在一个干净的目录下面.
@@ -72,7 +74,14 @@ git config --global user.email "xxx.mail"
 ## 把本地文件导入到maven仓库
 ```
 mvn install:install-file -Dfile=~/data/soft/flink-1.10.0/lib/flink-table_2.12-1.10.0.jar -DgroupId=org.apache.flink -DartifactId=flink-table_2.12 -Dversion=1.10.0 -Dpackaging=jar
+
+
+mvn install:install-file -Dfile=/home/cmwin/soft/javalib/sqljdbc42.jar -DgroupId=com.microsoft.sqlserver -DartifactId=sqljdbc4 -Dversion=4.2 -Dpackaging=jar
+
+mvn install:install-file -Dfile=/home/cmwin/soft/javalib/ftp4j-1.6.1.jar -DgroupId=it.sauronsoftware -DartifactId=ftp4j -Dversion=1.6 -Dpackaging=jar
 ```
+
+
 
 
 
@@ -234,3 +243,15 @@ git archive --format zip --output "../output.zip" master -0
  git clone git@10.67.31.48:/home/git/msgcenter.git
 
 git remote add origin git@192.168.101.14:/home/git/gitrepo/mcproj.git
+
+
+
+
+
+# SVN管理
+
+```
+svn info
+svn checkout svn://localhost/MC/projects/MC/source_code/branches/mc_v9.7
+```
+

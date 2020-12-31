@@ -66,7 +66,7 @@ nc -l 9999
 ```yaml
 # 在一台服务器上配置完成后，复制到其他服务器就可以。
 # jobManager 的IP地址
-jobmanager.rpc.address: localhost
+jobmanager.rpc.address: node03
 
 # JobManager 的端口号
 jobmanager.rpc.port: 6123
@@ -86,7 +86,33 @@ parallelism.default: 1
 
 # 文件系统来源
 # fs.default-scheme
+
+# #web ui端口
+rest.port: 8081
 ```
+
+
+
+#### 2.2.2 修改Flink配置文件masters
+
+```
+vim flink-1.11.2/conf/masters
+node03
+```
+
+
+
+#### 2.2.3 修改Flink配置文件workers
+
+```
+node21
+node22
+node23
+```
+
+
+
+#### 2.2.4 将node03节点上修改好的flink复制到其他两个Slave节点
 
 #### 2.2.2  高可用配置
 
@@ -197,6 +223,8 @@ yarn-session.sh -n 2 -s 2 -jm 1024 -tm 1024 -nm test -d
 
 
 ## 访问地址
+
+http://localhost:8081/#/overview
 
 | Flink管理节点访问 | http:node03:8081 |      |
 | ----------------- | ---------------- | ---- |
@@ -373,23 +401,78 @@ KeyedStream.maxBy("key")
 inputStream.union(inputStream1, inputStream2, ...);
 ```
 
+
+
+### connect
+
+```java
+//获取Flink运行环境
+StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+
+//绑定数据源
+DataStreamSource<Long> text1 = env.addSource(new MyParalleSource()).setParallelism(1);
+DataStreamSource<Long> text2 = env.addSource(new MyParalleSource()).setParallelism(1);
+
+//为了演示connect的不同，将第二个source的值转换为string
+SingleOutputStreamOperator<String> text2_str = text2.map(new MapFunction<Long, String>() {
+    @Override
+    public String map(Long value) throws Exception {
+        return "str" + value;
+    }
+});
+
+ConnectedStreams<Long, String> connectStream = text1.connect(text2_str);
+
+SingleOutputStreamOperator<Object> result = connectStream.map(new CoMapFunction<Long, String, Object>() {
+    @Override
+    public Object map1(Long value) throws Exception {
+        return value;
+    }
+
+    @Override
+    public Object map2(String value) throws Exception {
+        return value;
+    }
+});
+
+//打印到控制台,并行度为1
+result.print().setParallelism(1);
+env.execute( "StreamingDemoWithMyNoParalleSource");
+```
+
+
+
 ### Split
 
 ```java
-// 根据条件将流拆分为两个或多个流。 当您获得混合流并且您可能希望单独处理每个数据流时，可以使用此方法。
-SplitStream<Integer> split = inputStream.split(new OutputSelector<Integer>() {
-    @Override
-    public Iterable<String> select(Integer value) {
-        List<String> output = new ArrayList<String>(); 
-        if (value % 2 == 0) {
-            output.add("even");
-        }
-        else {
-            output.add("odd");
-        }
-        return output;
-    }
-});
+/获取Flink运行环境
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        
+        //绑定数据源
+        DataStreamSource<Long> text = env.addSource(new MyParalleSource()).setParallelism(1);
+        //对流进行切分 奇数偶数进行区分
+        SplitStream<Long> splitString = text.split(new OutputSelector<Long>() {
+            @Override
+            public Iterable<String> select(Long value) {
+                ArrayList<String> output = new ArrayList<>();
+                if (value % 2 == 0) {
+                    output.add("even");//偶数
+                } else {
+                    output.add("odd");//奇数
+                }
+ 
+                return output;
+            }
+        });
+ 
+        //选择一个或者多个切分后的流
+        DataStream<Long> evenStream = splitString.select("even");//选择偶数
+        DataStream<Long> oddStream = splitString.select("odd");//选择奇数
+ 
+        DataStream<Long> moreStream = splitString.select("odd","even");//选择多个流
+        //打印到控制台,并行度为1
+        evenStream.print().setParallelism(1);
+        env.execute( "StreamingDemoWithMyNoParalleSource");
 ```
 
 ### Select
@@ -402,8 +485,6 @@ DataStream<Integer> odd = split.select("odd");
 DataStream<Integer> all = split.select("even","odd");
 
 ```
-
-
 
 ### 窗口函数
 
@@ -454,7 +535,7 @@ JobManager从ResourceManager申请资源（taskmanager slots）来运行一个jo
 
 
 ```shell
-1. curl https://flink.apache.org/q/quickstart.sh | bash -s 1.11.1
+1. curl https://flink.apache.org/q/quickstart.sh | bash -s 1.11.2
 2. 在idea中打开项目
 3. 注释调maven依赖中的provided,这样就能直接在idea中运行项目。
 4. 把demo代码中的env.execute("Flink Batch Java API Skeleton");给注释掉，否则会报错。
@@ -493,7 +574,7 @@ public class BatchJob {
 >程序的输出会打到Flink主目录下面的log目录下的.out文件中
 
 
-## flink的开发流传
+## flink的开发流程
 
 ## flink从kafka中获取数据
 ## 启动本地flink集群,非root用户启动
@@ -594,4 +675,23 @@ bin/sql-client.sh embedded -d conf/sql-client-hive.yaml
 ```
 
 
+
+## flink table
+
+### flink sql client
+
+```shell
+1）bin/start-cluster.sh
+2) bin/sql-client.sh embedded
+
+SET execution.result-mode=table;
+SET execution.result-mode=changelog;
+
+# 执行查询语句。
+SELECT name, 
+  COUNT(*) AS cnt 
+  FROM (VALUES ('Bob'), ('Alice'), ('Greg'), ('Bob')) 
+  AS NameTable(name) 
+  GROUP BY name;
+```
 
