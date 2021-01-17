@@ -63,8 +63,8 @@ spring.datasource.druid.maxPoolPreparedStatementPerConnectionSize=20
 
 ```
 docker run -d -p 9090:9090 \
-    -v /data/config/prometheus.yml:/etc/prometheus/prometheus.yml \
-    prom/prometheus
+    -v /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml \
+    --name mc-prometheus prom/prometheus
 ```
 
 

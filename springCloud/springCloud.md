@@ -14,7 +14,14 @@ curl -s cmwin:manager@192.168.3.5:4001/oauth/token  \
  -d grant_type=client_credentials \
  -d scope=app
 
-
  curl -s clientId:secretId@192.168.3.5:4001oauth/token  \
  -d grant_type=client_credentials \
  -d scope=app
+
+
+
+```
+com.github
+thymeleaf-extras-shiro
+```
+

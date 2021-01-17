@@ -33,7 +33,7 @@ nmcli connection up eth0
 #显示详细信息  
 nmcli connection show
 nmcli connection show eth0
-
+systemctl restart network.service
 ```
 
 

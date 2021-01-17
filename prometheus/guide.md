@@ -37,3 +37,35 @@ scrape_configs:
 ~                        
 ```
 
+## promethus配在方式2
+
+```yaml
+- job_name: 'application'
+    scrape_interval: 5s
+    metrics_path: '/actuator/prometheus'
+    file_sd_configs:
+      - files: ['/usr/local/prometheus/groups/applicationgroups/*.json']
+      
+# 配置文件的详细信息。   
+$ vim groups/applicationgroups/application.json
+[
+    {
+        "targets": [
+            "192.168.1.124:8088"
+        ],
+        "labels": {
+            "instance": "springboot2-prometheus",
+            "service": "springboot2-prometheus-service"
+        }
+    }
+]      
+```
+
+
+
+## grafana的启动
+
+```
+docker run -d -p 3000:3000 --name=grafana grafana/grafana
+```
+
