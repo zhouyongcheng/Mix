@@ -231,12 +231,12 @@ chkconfig rpcbind on
 mkdir -p /data
 chown -R nfsnobody.nfsnobody /data
 #挂载
-mount -t nfs 172.20.193.33:/data /data
+mount -t nfs 192.168.101.4:/data /data
 df -h
 #检查
-showmount -e 172.20.193.33
+showmount -e 192.168.101.4
 
-mount -t nfs 172.25.216.21:/data /data
+mount -t nfs 192.168.101.4:/data /data
 ```
 
 
