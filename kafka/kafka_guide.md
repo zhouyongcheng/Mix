@@ -86,9 +86,18 @@ kafka消息采用二进制来保存，但仍然是结构化的数据。便于消
 ```
 
 # kafka常用命令
+
+## 查看kafka版本
+
+```
+手枪
+```
+
+
+
 ## 创建topic
 ```
-bin/kafka-topics.sh --create --zookeeper localhost:2181 --topic cdn-log --replication-factor 1 --partitions 1 
+JMX_PORT=9997 kafka-topics.sh --create --zookeeper zoo1:2181 --topic tp_stores_info --replication-factor 2 --partitions 4 
 查看创建的topic的详细信息
 bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic test
 列出创建的topic列表信息
@@ -100,7 +109,7 @@ bin/kafka-topics.sh --list --zookeeper localhost:2181
 
 ## 多副本，多partition的topic创建
 ```
- bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic my-replicated-topic
+ bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 2 --partitions 4 --topic tp_stores_info
  bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic my-replicated-topic
 ```
 
@@ -117,15 +126,19 @@ bin/kafka-console-consumer.sh --bootstrap-server 192.168.101.3:9092 --topic flin
 
 ## 增加topic的分区数
 ```sh
+
 bin/kafka-topics.sh --zookeeper localhost:2181 --alter --topic tp_product_sell_out_notification --partitions 9
 
 bin/kafka-topics.sh --zookeeper localhost:2182 --alter --topic tp_notify_dmb --partitions 8
+JMX_PORT=9997 bin/kafka-topics.sh --zookeeper localhost:2181 --alter --topic tp_product_sell_out_notification --partitions 9
+
+JMX_PORT=9997 bin/kafka-topics.sh --zookeeper zoo1:2181 --alter --topic my_stores --replication-factor 2
 ```
 
 ## 删除topic及相关数据
 ```shell
 # 只会删除zookeeper中的元数据，消息文件须手动删除
-bin/kafka-topics.sh  --delete --zookeeper localhost:2181 --topic tp_product_sell_out_notification 
+JMX_PORT=9997 kafka-topics.sh  --delete --zookeeper localhost:2181 --topic tp_stores
 # 方法二：待验证
 bin/kafka-run-class.sh kafka.admin.DeleteTopicCommand --zookeeper localhost:2181 --topic test
 ```

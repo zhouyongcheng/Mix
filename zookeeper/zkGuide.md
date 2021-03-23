@@ -1,8 +1,23 @@
 ## use root account do all the following things.
-
 ![zookeeper简介](http://static.open-open.com/lib/uploadImg/20141108/20141108213345_5.png)
 
 # 安装zookeeper
+zookeeper图像界面
+```
+git clone https://github.com/zzhang5/zooinspector.git
+cd zooinspector
+mvn clean package
+chmod +x target/zooinspector-pkg/bin/zooinspector.sh
+target/zooinspector-pkg/bin/zooinspector.sh
+```
+
+
+
+
+
+## 安装zookeeper
+
+>>>>>>> 4d7877170c8d9c4aeeda7db9c87d968de873bb29
 [Zookeeper下载](http://zookeeper.apache.org/releases.html)
 * 用户[安装/运行][root/root]
 * 建议使用3台机器进行集群部署，过半存活，集群对外才可用。
@@ -40,28 +55,18 @@ bin/zkCli.sh
 zkCli.sh -server ip:port
 ```
 
+## 
 
-## 应维
-## create zookeeper node
-create [-s] [-e] path data acl    s->sequential node | e->temp node
-----------------------------------------
-example:
-create /zk-book 123               path=/zk-book    data=123
+## 常用客户端命令
 
-ls path 
-example:
-ls /zk-book
+```shell
+# 创建临时有序节点
+create [-s] [-e] path data acl
 
-get path
-get /zk-book
+参数解释：
+s->sequential （有序）
+e-> 临时节点
 
-set path data
-set /zk-book 456
-
-delete path [version]
-
-
-
-
-
-
+# 查看zookeeper的版本信息
+echo stat | nc localhost 2181
+```

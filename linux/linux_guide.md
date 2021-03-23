@@ -35,7 +35,7 @@ nmcli connection up eth0
 #显示详细信息  
 nmcli connection show
 nmcli connection show eth0
-
+systemctl restart network.service
 ```
 
 
@@ -238,3 +238,13 @@ showmount -e 172.20.193.33
 
 mount -t nfs 172.25.216.21:/data /data
 ```
+
+
+
+## ubuntu 网络管理
+
+```shell
+# ubuntu重启网络
+sudo service network-manager restart
+```
+
