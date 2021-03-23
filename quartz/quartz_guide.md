@@ -15,7 +15,7 @@ select * from mnct.QRTZ_JOB_DETAILS
 
 1） 修改spring-jobs.xml的cron表达式，找到dailyTrigger17进行修改
 2）执行下面两个更新语句
-update MNCT.QRTZ_CRON_TRIGGERS SET CRON_EXPRESSION = '0/20 * * * * ?' WHERE TRIGGER_NAME = 'dailyTrigger17';
+update MNCT.QRTZ_CRON_TRIGGERS SET CRON_EXPRESSION = '0/15 * * * * ?' WHERE TRIGGER_NAME = 'dailyTrigger17';
 update MNCT.QRTZ_TRIGGERS SET PREV_FIRE_TIME = 0, NEXT_FIRE_TIME = 0 WHERE TRIGGER_NAME = 'dailyTrigger17';
 3）重新启动服务
 ```
@@ -33,10 +33,19 @@ update MNCT.QRTZ_TRIGGERS SET PREV_FIRE_TIME = 0, NEXT_FIRE_TIME = 0 WHERE TRIGG
 update MNCT.QRTZ_CRON_TRIGGERS SET CRON_EXPRESSION = '0 20 3 * * ?' WHERE TRIGGER_NAME = 'dailyTrigger68';
 update MNCT.QRTZ_TRIGGERS SET PREV_FIRE_TIME = 0, NEXT_FIRE_TIME = 0 WHERE TRIGGER_NAME = 'dailyTrigger68';
 
-update MNCT.QRTZ_TRIGGERS SET PREV_FIRE_TIME = 1597867200000, NEXT_FIRE_TIME = 0 WHERE TRIGGER_NAME = 'dailyTrigger23';
-
-
-
 3）重新启动服务
 ```
 
+
+```sql
+1） 修改spring-jobs.xml的cron表达式
+# 锁定循环断货或者自动恢复3:40执行
+dailyTrigger63:   0 0 16 * * ?
+
+2）执行下面两个更新语句
+update MNCT.QRTZ_CRON_TRIGGERS SET CRON_EXPRESSION = '0 0 16 * * ?' WHERE TRIGGER_NAME = 'dailyTrigger63';
+# next_fire_time设置为0，会立刻触发一次请求。
+update MNCT.QRTZ_TRIGGERS SET PREV_FIRE_TIME = 0, NEXT_FIRE_TIME = 0 WHERE TRIGGER_NAME = 'dailyTrigger63';
+
+3）重启服务
+```

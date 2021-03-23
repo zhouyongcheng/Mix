@@ -11,7 +11,7 @@
 关闭codis dashboard 
 /opt/codis/bin/codis-admin --dashboard=192.168.0.202:18080 --shutdown
 启动codis-server
-nohup /opt/codis/bin/codis-server /opt/codis/config/redis6319.conf 1>> yum_start_1.log &
+nohup /opt/codis/bin/codis-server /opt/codis/config/redis6329.conf 1>> yum_start_1.log &
 启动codis-fe
 nohup /opt/codis/bin/codis-fe --log=/tmp/cods_fe.log --dashboard-list=/home/mcuser/workjob/resource/codis.json --listen=0.0.0.0:18090 &
 启动codis-dashboard   

@@ -16,6 +16,8 @@ chmod +x finalshell_install_linux.sh;
 ```
 
 
+ls ~/logs/rocketmqlogs/ | xargs -i rm ~/logs/rocketmqlogs/{}
+
 
 创建网络连接
 

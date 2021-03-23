@@ -1,5 +1,7 @@
 ## use root account do all the following things.
 
+![zookeeper简介](http://static.open-open.com/lib/uploadImg/20141108/20141108213345_5.png)
+
 # 安装zookeeper
 [Zookeeper下载](http://zookeeper.apache.org/releases.html)
 * 用户[安装/运行][root/root]
