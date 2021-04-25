@@ -15,8 +15,18 @@ chmod +x finalshell_install_linux.sh;
 /usr/lib/FinalShell/bin
 ```
 
-
 ls ~/logs/rocketmqlogs/ | xargs -i rm ~/logs/rocketmqlogs/{}
+
+## 文本操作
+
+### 批量修改路径下文件中的内容
+
+```
+sed -i "s/192.168.101.1/127.0.0.1/g" `grep 192.168.101.1 -rl ./path`
+
+```
+
+
 
 
 创建网络连接
