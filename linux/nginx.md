@@ -1,15 +1,53 @@
-# nginx配置
+## nginx参考
 
-
-
+```
 https://www.cnblogs.com/wushuaishuai/tag/nginx/
-
-/etc/nginx/..
-
-## 查看nginx的模块信息
 ```
-2>&1 nginx -V | tr ' ' '\n' | grep stream
+
+
+
+## nginx安装
+
+```shell
+# 下载
+wget -c http://nginx.org/download/nginx-1.21.0.tar.gz
+# 解压
+tar -xzvf /tmp/nginx-1.21.0.tar.gz 
+# 配置
+./configure --prefix=/usr/local/nginx
+# 安装
+make && make install
+# 配置环境变量
+vim /etc/profile
+export NG_HOME=/usr/local/nginx
+export PATH=$PATH:$NG_HOME/sbin
+# 启动
+>nginx
 ```
+
+## nginx配置
+
+### 反向代理
+
+```json
+server {
+    # 监听的服务器和端口号
+	listen       9001;
+	server_name  192.168.17.129;
+
+    # 请求路径转发
+	location ~ /edu/ {
+		proxy_pass  http://127.0.0.1:8080
+	}
+
+	# 请求路径转发
+	location ~ /vod/ {
+		proxy_pass  http://127.0.0.1:8081
+	}
+}
+```
+
+
 
 
 ## nginx 常用命令

@@ -2,6 +2,43 @@ https://github.com/heibaiying/spring-samples-for-all
 
 https://www.jianshu.com/u/f1c47972d390
 
+### springboot热部署
+
+```XML
+1. 引入依赖
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-devtools</artifactId>
+</dependency>
+
+2. 修改pom的build plugin
+<build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <fork>true</fork>
+          <addResources>true</addResources>
+          <excludes>
+            <exclude>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+            </exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  3. alt + ctrl + shift + / 配在register选项
+    3.1 compiler.automake.allow.when.app.running
+    3.2 fromEdit
+
+```
+
+
+
 ## SpringBoot2全局事务配置
 
 ```java

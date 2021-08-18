@@ -1,6 +1,179 @@
 [hadoop](https://www.yiibai.com/hadoop)
 
-## 启动Hadoop集群
+## 集群安装
+
+### 基础环境设置
+
+```shell
+# 设置主机名称
+sudo hostnamectl set-hostname node41
+sudo hostnamectl set-hostname node42
+sudo hostnamectl set-hostname node43
+
+#编辑/etc/hosts
+192.168.101.41 node41
+192.168.101.41 node42
+192.168.101.41 node43
+
+# 下载hadoop3.1.4并解压到node41：/usr/local/hadoop,设置环境变量
+export HADOOP_HOME=/usr/local/hadoop
+export PATH=$PAGH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+# 生效
+source /etc/profile
+
+# 修改配置文件
+mkdir /usr/local/hadoop/data
+mkdir /usr/local/hadoop/hdfs/name
+mkdir /usr/local/haddop/hdfs/data
+
+
+```
+
+### core-sizte.xml修改
+
+```xml
+<configuration>
+  <!--定义namenode地址 默认9000-->
+  <property>
+    <name>fs.defaultFS</name>
+    <value>hdfs://node41:9003</value>
+  </property>
+  <!--修改用于hadoop存储数据的默认位置-->
+  <property>
+    <name>hadoop.tmp.dir</name>
+    <value>/usr/local/hadoop/data</value>
+  </property>
+</configuration>
+```
+
+### hdfs-site.xml 配置
+
+```xml
+<configuration>
+<property>
+  <name>dfs.namenode.name.dir</name>
+  <value>/usr/local/hadoop/hdfs/name</value>
+</property>
+<property>
+    <name>dfs.datanode.data.dir</name>
+    <value>/usr/local/hadoop/hdfs/data</value>
+</property>
+<property>
+    <name>dfs.replication</name>
+    <value>1</value>
+</property>
+</configuration>
+```
+
+### mapred-site.xml 配置
+
+```xml
+<configuration>
+   <property>
+       <name>mapreduce.framework.name</name>
+       <value>yarn</value>
+   </property>
+</configuration>
+```
+
+### yarn-site.xml配置
+
+```xml
+<configuration>
+<!-- Site specific YARN configuration properties -->
+<!-- 设置ResourceManager 域名 -->
+    <property>
+        <name>yarn.resourcemanager.hostname</name>
+        <value>node41</value>
+    </property>
+  <!-- 开启yarn.webapp.ui2 -->
+  <property>
+    <description>To enable RM web ui2 application.</description>
+    <name>yarn.webapp.ui2.enable</name>
+    <value>true</value>
+  </property>
+    <!-- 默认为true, 当虚拟机内存不够多时，容易超出虚拟机内存 -->
+    <property>
+      <name>yarn.nodemanager.vmem-check-enabled</name>
+      <value>false</value>
+      <description>Whether virtual memory limits will be enforced for containers.</description>
+    </property>
+</configuration>
+```
+
+### hadoop-env.sh
+
+```shell
+JAVA_HOME=/usr/local/jdk
+HADOOP_SHELL_EXECNAME=root
+HADOOP_SECURE_DN_USER=yarn
+HDFS_DATANODE_USER=root
+HDFS_DATANODE_SECURE_USER=hdfs
+HDFS_NAMENODE_USER=root
+HDFS_SECONDARYNAMENODE_USER=root
+YARN_RESOURCEMANAGER_USER=root
+YARN_NODEMANAGER_USER=root
+```
+
+### workers配置
+
+```txt
+node41
+node42
+node43
+```
+
+### 修改bin/hdfs
+
+```
+把HADOOP_SHELL_EXECNAME="hdfs"修改为HADOOP_SHELL_EXECNAME="root"即可
+```
+
+### 配置免密登录
+
+```shell
+# 在每台机器上执行下面命令(node41,node42,node43)
+ssh-keygen -t rsa
+
+# copy每台机器的id到node41上面
+# node41, node42， node43上分别执行
+ssh-copy-id node41
+
+# 把node41上的~/.ssh/authorized_keys文件copy到node42,node43
+scp ~/.ssh/authorized_keys node42:`pwd`
+scp ~/.ssh/authorized_keys node43:`pwd`
+```
+
+### 启动Hadoop集群
+
+```shell
+# 格式化namenode
+hadoop namenode -format
+
+无边无际 下棋
+
+#启动hdfs集群：
+start-dfs.sh   #启动hdfs集群
+stop-dfs.sh   #停止hdfs集群
+
+#启动yarn集群：
+start-yarn.sh    #启动yarn集群
+stop-yarn.sh     #停止yarn集群
+
+#一次性启动hdfs、yarn集群：
+start-all.sh
+stop-all.sh
+```
+
+### 访问集群
+
+```
+yarn：http://node41:8088
+hdfs：http://node41:9870
+```
+
+
+
 * 单机模式
 * 伪分布式模式
 * 完全分布式模式

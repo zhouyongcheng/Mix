@@ -51,7 +51,7 @@
 ```
  mongod --dbpath /data/db
  mongod -f /etc/mongodb.cnf
- mongod --shutdown
+ mongod --shutdown  --dbpath /data/db
  mongod --config /etc/mongod/mongod.conf 
  use admin | db.shutdownServer()
 
@@ -325,4 +325,16 @@ db.posts.dropIndex({"name": 1})
 mongoimport -d blog -c student -u cmwin -p cmwin --type csv --file ~/tmp/student.csv --headerline
 mongoexport -d blog -c student -u cmwin -p cmwin -q {} -f _id,Title,Message,Author --csv > blogposts.csv
 ````
+
+## 复制集
+
+```
+# 在从节点上执行下面的命令，则客户端能够读从节点的数据。
+db.getMongo().setReadPref("nearest");
+db.getMongo().setReadPref("primaryPreferred");
+primary
+primaryPreferred
+secondary
+secondaryPreferred
+```
 

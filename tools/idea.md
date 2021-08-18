@@ -1,3 +1,14 @@
+## ideavim
+
+```shell
+# 在home目录下创建 .ideavimrc
+# jj代替Esc
+imap jj <Esc>
+set timeoutlen=1000
+```
+
+
+
 ## 注释模版
 
 ```properties

@@ -15,17 +15,23 @@ https://thepracticaldeveloper.com/2018/11/24/spring-boot-kafka-config/
 
 1. (kafka eagle)[http://download.smartloli.org/]
 
-2. kafka manager
+2. http://www.kafka-eagle.org/articles/docs/installation/linux-macos.html
+
+3. kafka manager
 
    ## topic的创建
 
-1. 设定topic的partition数， partition是分散到各个broker上。
-2. 设定partition的副本数，各个副本也存储在各个broker上，数据冗余。可靠性。
-3. 每个partition都会一个leader的broker，其他副本的broker叫做flower. 写操作只会针对leader partition。
-4. 如果要保障整个topic的顺序性，则一个topic创建一个partition来保障。丢失并发能力。
-5. 生产环境中，topic的partition数<=broker的个数。
+4. 设定topic的partition数， partition是分散到各个broker上。
 
-# 为什么要选择kafka？
+5. 设定partition的副本数，各个副本也存储在各个broker上，数据冗余。可靠性。
+
+6. 每个partition都会一个leader的broker，其他副本的broker叫做flower. 写操作只会针对leader partition。
+
+7. 如果要保障整个topic的顺序性，则一个topic创建一个partition来保障。丢失并发能力。
+
+8. 生产环境中，topic的partition数<=broker的个数。
+
+## 为什么要选择kafka？
 * 高性能的消息发送及消息消费。
 * 高吞吐率（超大量级的数据实时传输），每秒能处理的消息数（数据量）
 * 实时性（低延时），客户端发送消息到客户端消费消息的时间。 高吞吐低延时。
@@ -73,30 +79,31 @@ kafka消息采用二进制来保存，但仍然是结构化的数据。便于消
 > 直接查看kafka/lib/kafka*.jar,后面的序号就是kafka的版本。前面的版本号是scala的版本号
 
 ## 安装kafka
-> 直接解压下载的二进制文件到指定的目录，设置环境变量就完成安装工作。
-> 
+> 直接解压下载的二进制文件到指定的目录，设置环境变量就完成安装工作
 
-## 启动kafka
+## 查看kafka的状态
+
 ```
+
+```
+
+
+
+## 启动kafka(root用户)
+```shell
    在启动kafka之前，先要启动zookeeper， 压缩包中已经内置了zookeeper.可直接启动。
    在KAFKA_HOME目录下执行下面命令：
-   本地单例起到zookeeper和kafka
-   bin/zookeeper-server-start.sh config/zookeeper.prperties
+   # 本地单例启动zookeeper和kafka
+   # 用root用户进行启动 /data/soft/kafka
+   bin/zkServer.sh start
    bin/kafka-server-start.sh  -daemon /data/soft/kafka/config/server.properties
 ```
 
-# kafka常用命令
+## kafka常用命令
 
-## 查看kafka版本
+### 创建topic
 
-```
-手枪
-```
-
-
-
-## 创建topic
-```
+```shell
 JMX_PORT=9997 kafka-topics.sh --create --zookeeper zoo1:2181 --topic tp_stores_info --replication-factor 2 --partitions 4 
 查看创建的topic的详细信息
 bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic test
@@ -107,13 +114,13 @@ bin/kafka-topics.sh --list --zookeeper localhost:2181
 2) partitions:         分区数（不同的消息保存到不同的分区上，横向扩展）
 ```
 
-## 多副本，多partition的topic创建
-```
+```shell
+ # 多副本，多partition的topic创建
  bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 2 --partitions 4 --topic tp_stores_info
  bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic my-replicated-topic
 ```
 
-## 通过kafka的控制台发生消息和消费消息
+### 控制台生产消费者
 ```
 bin/kafka-console-producer.sh --broker-list 10.67.31.48:9092 --topic mytopic
 bin/kafka-console-producer.sh --broker-list localhost:9092 --topic cdn-log
@@ -124,14 +131,14 @@ bin/kafka-console-producer.sh --broker-list 192.168.101.3:9092 --topic flink1
 bin/kafka-console-consumer.sh --bootstrap-server 192.168.101.3:9092 --topic flink1 --from-beginning
 ```
 
-## 增加topic的分区数
+### 增加topic的分区数
 ```sh
 JMX_PORT=9997 bin/kafka-topics.sh --zookeeper localhost:2181 --alter --topic tp_product_sell_out_notification --partitions 9
 
 JMX_PORT=9997 bin/kafka-topics.sh --zookeeper zoo1:2181 --alter --topic my_stores --replication-factor 2
 ```
 
-## 删除topic及相关数据
+### 删除topic及相关数据
 ```shell
 # 只会删除zookeeper中的元数据，消息文件须手动删除
 JMX_PORT=9997 kafka-topics.sh  --delete --zookeeper localhost:2181 --topic tp_stores
@@ -139,31 +146,35 @@ JMX_PORT=9997 kafka-topics.sh  --delete --zookeeper localhost:2181 --topic tp_st
 bin/kafka-run-class.sh kafka.admin.DeleteTopicCommand --zookeeper localhost:2181 --topic test
 ```
 
-## 消费者相关命令
+### 消费者组相关命令
 
 ```shell
 # 首先我们需要知道当前有哪些消费者group，如果已知，此步骤可忽略
 bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
 # 显示消费者组的相信信息
 bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group GROUP_NAME --describe
-kafka-consumer-groups.sh --zookeeper localhost:2181 --group g_product_sell_out_dmb --describe
+bing/kafka-consumer-groups.sh --zookeeper localhost:2181 --group G_NAME --describe
 # 查看消费者组的成员信息(id,host,client_id, partitions)
 bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group group1 --members
 ```
 
-## 查看topic某分区偏移量最大（小）值
+### topic分区偏移量
 
 ```shell
 bin/kafka-run-class.sh kafka.tools.GetOffsetShell --topic student --time -1 --broker-list localhost:9092 --partitions 0
 ```
 
-## 查看topic消费进度
+### 查看topic消费进度
 
 ```
 bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --group groupName
 ```
 
+### 消费者命令行提交偏移量
 
+```shell
+./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group g_name --topic mytopic  --reset-offsets --to-latest --execute
+```
 
 
 

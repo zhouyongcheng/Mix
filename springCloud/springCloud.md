@@ -1,4 +1,7 @@
+
+
 # oauth endpoint
+
 ```
 /oauth/authorize  (授权端，授权码模式使用)
 /oauth/token      (令牌端，获取 token)

@@ -15,9 +15,70 @@ chmod +x finalshell_install_linux.sh;
 /usr/lib/FinalShell/bin
 ```
 
+## 网络配置
+
+```properties
+# 网卡配置文件
+/etc/sysconfig/network-scripts/ifcfg-eth0
+# 主机名文件,修改完后需要重新启动服务器（但是可以通过hostname命令设置，临时生效，下次启动就自然好了）
+/etc/sysconfig/network
+#dns文件
+/etc/resolv.conf
+```
+
+## 网络常用命令
+
+```shell
+# 查看本机的hostname或在临时设置hostname
+hostname
+# 查看dns服务器
+nslookup  server
+# 网络状态
+netstat -tuln
+# 网络耕种
+traceroute
+# 查看端口占用情况
+lsof -i:8080
+```
+
+## sudo用户添加
+
+```
+visudo -f /ect/sudoers
+myname  ALL=(ALL) NOPASSWD:ALL
+
+```
 
 
-创建网络连接
+
+## hostname设置
+
+```shell
+hostnamectl --static set-hostname redis-11
+hostnamectl --static set-hostname redis-12
+hostnamectl --static set-hostname redis-13
+```
+
+## 设备挂载
+
+```
+mount /dev/cdrom /mnt/cdrom
+```
+
+
+
+## 查看cup信息
+
+```shell
+# 查看物理CPU的个数
+cat /proc/cpuinfo |grep "physical id"|sort |uniq|wc -l  
+# 查看逻辑CPU的个数
+cat /proc/cpuinfo |grep "processor"|wc -l 
+# 查看CPU是几核
+cat /proc/cpuinfo |grep "cores" | uniq
+```
+
+## 创建网络连接
 
 ```shell
 # 查看物理网卡的信息
@@ -88,7 +149,6 @@ hostnamectl --static set-hostname name
 ```
 1. ssh-keygen -t rsa
 2. ssh-copy-id -i ~/.ssh/id_rsa.pub username@nodename
-
 ssh-copy-id -i ~/.ssh/id_rsa.pub cmwin@node03
 ```
 
@@ -131,6 +191,29 @@ systemctl status firewalld.service
 # 编辑/etc/profile
 # 编辑~/.bashrc
 # 在/etc/profile.d/myenv.sh, 这样，每次服务器启动的时候都会加载环境变量。
+```
+
+
+
+## yum的使用
+
+```shell
+yum list
+yum search httpd
+# 更新指定的包名
+yum -y update package_name
+# 查询组名称。
+yum grouplist
+yum groupinstall group_name
+yum groupremove group_name
+
+# 不要执行全系统更新
+yum -y update  # 一定不要执行
+# 卸载
+yum -y remove package_name
+
+# 尽量不要装使用的软件。
+# 尽量不要使用yum remove
 ```
 
 
@@ -244,5 +327,34 @@ mount -t nfs 172.25.216.21:/data /data
 ```shell
 # ubuntu重启网络
 sudo service network-manager restart
+```
+
+## 虚拟机的配置
+
+```
+clone虚拟机后，需要修改网络配置项目
+1）/etc/sysconfig/network-scripts/ifcfg-eth0
+# 删除mac地址
+2） rm -rf /etc/udev/rules.d/70-persistent-net.rules
+3)reboot system
+```
+
+## putty安装
+
+```
+依赖安装：
+yum -y install gcc
+yum -y install gtk2-devel
+
+# 下载源码
+https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html
+# 解压/data/soft/putty-074
+./configure --prefix=/opt/putty --exec-prefix=/opt/putty
+
+
+设置前景色：224 226 228
+default background ：41 49 52
+default background ：39 40 34 
+default background ：50 50 48 
 ```
 

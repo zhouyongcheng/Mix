@@ -432,6 +432,8 @@ docker pull ubuntu:14.04
 ### 安装zookeeper
 
 ```shell
+docker run -d --name zookeeper -p 2181:2181 -v /etc/localtime:/etc/localtime -t zookeeper
+
 docker pull wurstmeister/zookeeper
 docker run -d --name zookeeper -p 2181:2181 -v /etc/localtime:/etc/localtime -t wurstmeister/zookeeper
 
@@ -524,7 +526,7 @@ docker run -d \
 
 ## use image to create container
 
-```shell
+​```shell
 docker create -it ubuntu             // create the container but at stop status
 -t :  pseudo-tty   terminal
 -i : container standard input open status.

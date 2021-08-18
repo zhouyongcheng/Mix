@@ -36,6 +36,7 @@ make PREFIX=/usr/local/redis install
 # 卸载
 make uninstall
 
+# redis停止服务
 src/redis-server
 src/redis-cli
 src/redis-cli shutdown NOSAVE
@@ -170,7 +171,99 @@ redis-cli>
 
 ```
 
+## rediscluster
+
+### 配置/etc/hosts
+
+```shell
+192.168.0.120 node1
+192.168.0.130 node2
+192.168.0.140 node3
+```
+
+### 下载redis
+
+```shell
+wget https://download.redis.io/releases/redis-6.2.1.tar.gz
+```
+
+### 安装redis
+
+```shell
+mkdir -p /usr/local/redis_cluster/redis_63{79,80}/{conf,pid,logs}
+tar -zxvf redis-6.2.1.tar.gz -C /usr/local/redis_cluster/
+cd /usr/local/redis_cluster/redis-6.2.1/
+make && make install 
+```
+
+### 配置文件
+
+```shell
+# 快速修改：:%s/6379/6380/g
+
+# 守护进行模式启动
+daemonize yes
+
+# 设置数据库数量，默认数据库为0
+databases 16
+
+# 绑定地址，需要修改
+bind 192.168.0.120
+
+# 绑定端口，需要修改
+port 6379
+
+# pid文件存储位置，文件名需要修改
+pidfile /usr/local/redis_cluster/redis_6379/pid/redis_6379.pid
+
+# log文件存储位置，文件名需要修改
+logfile /usr/local/redis_cluster/redis_6379/logs/redis_6379.log
+
+# RDB快照备份文件名，文件名需要修改
+dbfilename redis_6379.rdb
+
+# 本地数据库存储目录，需要修改
+dir /usr/local/redis_cluster/redis_6379
+
+# 集群相关配置
+# 是否以集群模式启动
+cluster-enabled yes
+
+# 集群节点回应最长时间，超过该时间被认为下线
+cluster-node-timeout 15000
+
+# 生成的集群节点配置文件名，文件名需要修改
+cluster-config-file nodes_6379.conf
+```
+
+### 启动集群
+
+```shell
+ redis-server /usr/local/redis_cluster/redis_6379/conf/redis.cnf
+ redis-server /usr/local/redis_cluster/redis_6380/conf/redis.cnf
+```
+
+### 加入集群
+
+```shell
+$ redis-cli -h node1 -p 6379
+node1:6379> cluster meet 192.168.0.130 6379
+node1:6379> cluster meet 192.168.0.140 6379
+node1:6379> cluster meet 192.168.0.120 6380
+node1:6379> cluster meet 192.168.0.130 6380
+node1:6379> cluster meet 192.168.0.140 6380
+```
+
+### 查看端口监听
+
+```shell
+netstat -lnpt | grep redis
+```
+
+
+
 ## redis服务器配置
+
 ```properties
 maxmemory=xxxxxx
 maxmemory-policy=[volatile-lru | allkeys-lru | volatile-ttl ]
