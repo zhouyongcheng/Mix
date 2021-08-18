@@ -1,7 +1,8 @@
 ## use root account do all the following things.
+![zookeeper简介](http://static.open-open.com/lib/uploadImg/20141108/20141108213345_5.png)
 
+# 安装zookeeper
 zookeeper图像界面
-
 ```
 git clone https://github.com/zzhang5/zooinspector.git
 cd zooinspector
@@ -16,6 +17,7 @@ target/zooinspector-pkg/bin/zooinspector.sh
 
 ## 安装zookeeper
 
+>>>>>>> 4d7877170c8d9c4aeeda7db9c87d968de873bb29
 [Zookeeper下载](http://zookeeper.apache.org/releases.html)
 * 用户[安装/运行][root/root]
 * 建议使用3台机器进行集群部署，过半存活，集群对外才可用。

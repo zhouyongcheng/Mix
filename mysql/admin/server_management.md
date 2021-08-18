@@ -1,7 +1,8 @@
 ## 常用命令
 
 ```mysql
-mysql -uroot -p
+# 登录命令
+mysql -h 127.0.0.1 -P3306 -uroot -p
 
 ```
 
@@ -206,8 +207,6 @@ show table status like 't_mytable'\G;
 
 
 mysql> show warnings;
-
-
 
 
 

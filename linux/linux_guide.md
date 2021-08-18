@@ -15,6 +15,7 @@ chmod +x finalshell_install_linux.sh;
 /usr/lib/FinalShell/bin
 ```
 
+<<<<<<< HEAD
 ## 网络配置
 
 ```properties
@@ -63,6 +64,17 @@ hostnamectl --static set-hostname redis-13
 
 ```
 mount /dev/cdrom /mnt/cdrom
+=======
+ls ~/logs/rocketmqlogs/ | xargs -i rm ~/logs/rocketmqlogs/{}
+
+## 文本操作
+
+### 批量修改路径下文件中的内容
+
+```
+sed -i "s/192.168.101.1/127.0.0.1/g" `grep 192.168.101.1 -rl ./path`
+
+>>>>>>> e2834310103d6ad33d21052dcce4cc206cc958c0
 ```
 
 
@@ -312,12 +324,12 @@ chkconfig rpcbind on
 mkdir -p /data
 chown -R nfsnobody.nfsnobody /data
 #挂载
-mount -t nfs 172.20.193.33:/data /data
+mount -t nfs 192.168.101.4:/data /data
 df -h
 #检查
-showmount -e 172.20.193.33
+showmount -e 192.168.101.4
 
-mount -t nfs 172.25.216.21:/data /data
+mount -t nfs 192.168.101.4:/data /data
 ```
 
 

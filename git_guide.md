@@ -1,6 +1,6 @@
-## 1. 添加阿里的manen镜像
+# 常用工具服务
 
-
+## 添加阿里的manen镜像
 
 ```xml
 <!-- 第一步:修改maven根目录下的conf文件夹中的setting.xml文件-->
@@ -34,15 +34,13 @@
 ```shell
 # 查看tag列表
 git tag
-
 # -a 参数：创建带注解的标签
-git tag -a v1.9.3 
-
+git tag -a v2.1.6 -m "modify channel display name function"
 # 推送tag到远程仓库
-git push origin v1.9.3
+git push origin v2.1.6
+# 查看git的tag信息
+git tag -l -m
 ```
-
-
 
 ## 保存git的密码
 
@@ -56,10 +54,11 @@ git config --global user.email "xxx.mail"
 
 ## svn 导出纯代码
 
-1. 拷贝svn的项目,放在一个干净的目录下面.
-2. 执行下面的清理脚步,完成svn信息的清除.
 ```bat
- @echo On
+# 1. 拷贝svn的项目,放在一个干净的目录下面.
+# 2. 执行下面的清理脚步,完成svn信息的清除.
+
+@echo On
  @Rem 删除SVN版本控制目录
  @PROMPT [Com]
 
@@ -81,20 +80,14 @@ mvn install:install-file -Dfile=/home/cmwin/soft/javalib/sqljdbc42.jar -DgroupId
 mvn install:install-file -Dfile=/home/cmwin/soft/javalib/ftp4j-1.6.1.jar -DgroupId=it.sauronsoftware -DartifactId=ftp4j -Dversion=1.6 -Dpackaging=jar
 ```
 
-
-
-
-
-# common command
+common command
 
 ```shell
 #当执行 "git reset HEAD" 命令时，暂存区的目录树会被重写，被 master 分支指向的目录树所替换，但是工作区不受影响。
 #当执行 "git rm --cached <file>" 命令时，会直接从暂存区删除文件，工作区则不做出改变。
-
 #当执行 "git checkout ." 或者 "git checkout -- <file>" 命令时，会用暂存区全部或指定的文件替换工作区的文件。这个操作很危险，会清除工作区中未添加到暂存区的改动。
 
 #当执行 "git checkout HEAD ." 或者 "git checkout HEAD <file>" 命令时，会用 HEAD 指向的 master 分支中的全部或者部分文件替换暂存区和以及工作区中的文件。这个命令也是极具危险性的，因为不但会清除工作区中未提交的改动，也会清除暂存区中未提交的改动。
-
 
 #要从 Git 中移除某个文件，就必须要从已跟踪文件清单中移除，然后提交。可以用以下命令完成此项工作
 git rm <file>
@@ -113,25 +106,20 @@ git mv README  README.md
 
 
 # Git 服务器搭建
-```
-创建一个git用户组和用户
+```shell
+# 创建一个git用户组和用户
 groupadd git
 useradd git -g git
 passwd  manager/manager
-```
 
-##创建证书登录
-
-```
+# 创建证书登录
 $ cd /home/git/
 $ mkdir .ssh
 $ chmod 755 .ssh
 $ touch .ssh/authorized_keys
 $ chmod 644 .ssh/authorized_keys
-```
 
-## 初始化Git仓库
-```
+# 初始化Git仓库
 $ cd /home/git
 $ mkdir gitrepo
 $ chown git:git gitrepo/
@@ -140,7 +128,7 @@ $ git init --bare cmwin.git
 $ chown -R git:git cmwin.git
 ```
 
-### 远程仓库管理
+## 远程仓库管理
 
 ```properties
 # clone远程仓库
@@ -219,19 +207,26 @@ git checkout -b local_name origin/bname
 * git stash drop  stash@{0}
 
 ## 标签管理 
-> 注意，标签不是按时间顺序列出，而是按字母排序的
-* git tag v1.0   在当前分支，当前提交上打tag
-* git tag v1.1   在当前分支，指定的提交上打tag
-* git show tagname  显示tag的基本信息
-* git tag -a v0.1 -m "version 0.1 released" 1094adb   创建带有说明的标签，用-a指定标签名，-m指定说明文字
-* git tag -d v0.1  删除标签
-* git push origin <tagname>
-* git push origin --tags   一次性推送全部尚未推送到远程的本地标签
->标签已经推送到远程，要删除远程标签就麻烦一点，先从本地删除
-```
+
+```shell
+# 在当前分支，当前提交上打tag
+git tag v1.0   
+# 在当前分支，指定的提交上打tag
+git tag v1.1   
+# 显示tag的基本信息
+git show tagname  
+# 创建带有说明的标签，用-a指定标签名，-m指定说明文字
+git tag -a v0.1 -m "version 0.1 released"
+# 删除标签
+git tag -d v0.1  
+# 推送指定的tag到远程仓库 
+git push origin tagname
+# 标签已经推送到远程，要删除远程标签就麻烦一点，先从本地删除
 git tag -d v0.9
 git push origin :refs/tags/v0.9
 ```
+
+
 
 ## git 导出纯代码
 ```
@@ -243,10 +238,6 @@ git archive --format zip --output "../output.zip" master -0
  git clone git@10.67.31.48:/home/git/msgcenter.git
 
 git remote add origin git@192.168.101.14:/home/git/gitrepo/mcproj.git
-
-
-
-
 
 # SVN管理
 

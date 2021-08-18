@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## ideavim
 
 ```shell
@@ -5,6 +6,12 @@
 # jj代替Esc
 imap jj <Esc>
 set timeoutlen=1000
+=======
+## idea隐藏文件类型
+
+```
+
+>>>>>>> e2834310103d6ad33d21052dcce4cc206cc958c0
 ```
 
 

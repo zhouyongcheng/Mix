@@ -133,6 +133,10 @@ bin/kafka-console-consumer.sh --bootstrap-server 192.168.101.3:9092 --topic flin
 
 ### 增加topic的分区数
 ```sh
+
+bin/kafka-topics.sh --zookeeper localhost:2181 --alter --topic tp_product_sell_out_notification --partitions 9
+
+bin/kafka-topics.sh --zookeeper localhost:2182 --alter --topic tp_notify_dmb --partitions 8
 JMX_PORT=9997 bin/kafka-topics.sh --zookeeper localhost:2181 --alter --topic tp_product_sell_out_notification --partitions 9
 
 JMX_PORT=9997 bin/kafka-topics.sh --zookeeper zoo1:2181 --alter --topic my_stores --replication-factor 2
