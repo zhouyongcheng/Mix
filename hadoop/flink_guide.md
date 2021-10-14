@@ -533,9 +533,22 @@ JobManager从ResourceManager申请资源（taskmanager slots）来运行一个jo
 
 ## 创建flink的maven项目
 
+```shell
+mvn archetype:generate \
+    -DarchetypeGroupId=org.apache.flink \
+    -DarchetypeArtifactId=flink-walkthrough-datastream-java \
+    -DarchetypeVersion=1.14.0 \
+    -DgroupId=com.amy.flink \
+    -DartifactId=flink14demo \
+    -Dversion=0.1 \
+    -Dpackage=spendreport \
+    -DinteractiveMode=false
+
+```
+
 
 ```shell
-1. curl https://flink.apache.org/q/quickstart.sh | bash -s 1.11.2
+1. curl https://flink.apache.org/q/quickstart.sh | bash -s 1.14.0
 2. 在idea中打开项目
 3. 注释调maven依赖中的provided,这样就能直接在idea中运行项目。
 4. 把demo代码中的env.execute("Flink Batch Java API Skeleton");给注释掉，否则会报错。

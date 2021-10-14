@@ -15,7 +15,6 @@ chmod +x finalshell_install_linux.sh;
 /usr/lib/FinalShell/bin
 ```
 
-<<<<<<< HEAD
 ## 网络配置
 
 ```properties
@@ -64,7 +63,6 @@ hostnamectl --static set-hostname redis-13
 
 ```
 mount /dev/cdrom /mnt/cdrom
-=======
 ls ~/logs/rocketmqlogs/ | xargs -i rm ~/logs/rocketmqlogs/{}
 
 ## 文本操作
@@ -74,7 +72,6 @@ ls ~/logs/rocketmqlogs/ | xargs -i rm ~/logs/rocketmqlogs/{}
 ```
 sed -i "s/192.168.101.1/127.0.0.1/g" `grep 192.168.101.1 -rl ./path`
 
->>>>>>> e2834310103d6ad33d21052dcce4cc206cc958c0
 ```
 
 
