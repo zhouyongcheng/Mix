@@ -12,8 +12,8 @@ sudo hostnamectl set-hostname node43
 
 #编辑/etc/hosts
 192.168.101.41 node41
-192.168.101.41 node42
-192.168.101.41 node43
+192.168.101.42 node42
+192.168.101.43 node43
 
 # 下载hadoop3.1.4并解压到node41：/usr/local/hadoop,设置环境变量
 export HADOOP_HOME=/usr/local/hadoop
@@ -22,11 +22,9 @@ export PATH=$PAGH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
 source /etc/profile
 
 # 修改配置文件
-mkdir /usr/local/hadoop/data
-mkdir /usr/local/hadoop/hdfs/name
-mkdir /usr/local/haddop/hdfs/data
-
-
+mkdir -p /usr/local/hadoop/data
+mkdir -p /usr/local/hadoop/hdfs/name
+mkdir -p /usr/local/haddop/hdfs/data
 ```
 
 ### core-sizte.xml修改
@@ -105,14 +103,14 @@ mkdir /usr/local/haddop/hdfs/data
 
 ```shell
 JAVA_HOME=/usr/local/jdk
-HADOOP_SHELL_EXECNAME=root
-HADOOP_SECURE_DN_USER=yarn
-HDFS_DATANODE_USER=root
-HDFS_DATANODE_SECURE_USER=hdfs
-HDFS_NAMENODE_USER=root
-HDFS_SECONDARYNAMENODE_USER=root
-YARN_RESOURCEMANAGER_USER=root
-YARN_NODEMANAGER_USER=root
+export HADOOP_SHELL_EXECNAME=root
+export HADOOP_SECURE_DN_USER=yarn
+export HDFS_DATANODE_USER=root
+export HDFS_DATANODE_SECURE_USER=hdfs
+export HDFS_NAMENODE_USER=root
+export HDFS_SECONDARYNAMENODE_USER=root
+export YARN_RESOURCEMANAGER_USER=root
+export YARN_NODEMANAGER_USER=root
 ```
 
 ### workers配置
@@ -149,8 +147,6 @@ scp ~/.ssh/authorized_keys node43:`pwd`
 ```shell
 # 格式化namenode
 hadoop namenode -format
-
-无边无际 下棋
 
 #启动hdfs集群：
 start-dfs.sh   #启动hdfs集群

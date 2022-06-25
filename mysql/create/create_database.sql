@@ -4,9 +4,9 @@
 drop [database | schema] if exists db_name;
 
 
-create database mcsell character set utf8;
+create database cmwin character set utf8;
 
-CREATE DATABASE mcsell DEFAULT CHARSET utf8 COLLATE utf8_general_ci;
+CREATE DATABASE cmwin DEFAULT CHARSET utf8 COLLATE utf8_general_ci;
 
 
 create table todo (

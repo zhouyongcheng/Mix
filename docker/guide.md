@@ -110,12 +110,20 @@ $chmod +x /usr/local/bin/docker-compose
 
 ```properties
 docker pull mysql:5.7
-docker run --name my-mysql -p 3306:3306 -d --privileged -v /data/mysql_data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 mysql:5.7
+# 映射出docker中的配置文件到本地
+docker run --name my-mysql -p 3306:3306 -d --privileged -v /etc/mysql/:/etc/mysql/conf.d/ -v /data/mysql_data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 mysql:5.7.23
+# 只映射数据存储地址和端口。
+docker run --name my-mysql -p 3306:3306 -d -v /etc/mysql/:/etc/mysql/conf.d/ -v /data/mysql/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456  mysql:5.7.23
+
 # 参数说明：
 	#映射容器服务的 3306 端口到宿主机的 3306 端口，外部主机可以直接通过 宿主机ip:3306
 	-p 3306:3306
 	# 设置MySQL服务root用户的密码。
 	MYSQL_ROOT_PASSWORD=123456
+# 进入docker容器环境。	
+docker exec -it my-mysql /bin/bash
+
+# copy本地文件到docker容器中
 ```
 
 ### docker安装redis
@@ -133,7 +141,7 @@ docker exec -it my-redis /bin/bash
 
 安装mongodb
 
-```
+```properties
 docker run --name mc-mongo -p 27017:27017 -v /data/db:/data/db -d mongo:latest
 docker exec -it 容器id /bin/bash
 
@@ -577,6 +585,7 @@ docker port container_id  // confirm docker running port information
    
 3. 基于Dockerfile创建
 docker build -t spring-boot .
+docker build -t apache/dolphinscheduler:mysql-driver .
 ````
 
 ## 存出或导入镜像，上传镜像到仓库
@@ -590,6 +599,8 @@ docker load < hello-world.tar
 
 上传镜像到仓库(默认远程仓库)
 docker push image_name:[tag]
+
+
 ````
 
 
@@ -604,6 +615,9 @@ docker pull tomcat:latest
 docker rmi id
 # 删除所有的images
 docker rmi -f $(docker images -aq)
+
+# copy本的文件到docker容器
+docker cp  c:/temp/file.txt container_name:/etc/
 
 # 容器命令
 # 创建容器并处于停止状态，启动容器
@@ -625,6 +639,12 @@ docker run image
 docker run -d -p 4001:4001 --name spring-boot spring-boot-image
 # 查看守护进程的输出内容
 docker logs container_id
+docker logs -f container_id
+docker logs --tail 10 container_id
+
+
+
+
 # 停止容器
 docker stop container_id
 # 查看处于终止状态的容器，并重新启动
@@ -777,13 +797,29 @@ http://localhost:15672  guest/guest
 
 ```
 
+# 创建自己的bridge网络，创建容器的时候指定ip
+docker network create --driver bridge --subnet=172.18.0.0/16 --gateway=172.18.0.1 zoonet
+
 ```
 
 ### docker常用网络命令
 
-```
+``` bash
 docker network ls
 docker network connect
+
+# 查看容器的配置信息
+docker inspect container_id
+
+
+# 查看网络下面都有那些容器
+docker network inspect network_name
+
+
+# 解除当前容器的网络绑定操作
+docker network disconnect network_name container_id
+docker network connect  network_name container_id
+docker restart container_id
 ```
 
 

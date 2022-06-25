@@ -135,7 +135,7 @@ grant select on myschema.* to cmwin identified by '123456';
 grant select on myschema.* to cmwin@192.168.0.2 identified by '123456';
 grant select on mysql.user to cmwin@192.168.0.2;
 
-GRANT ALL PRIVILEGES ON cmwin.* TO 'root'@'%' IDENTIFIED BY 'cmwin@110!' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'cmwin110!' WITH GRANT OPTION;
 
 GRANT ALL PRIVILEGES ON cmwin.* to 'root'@'%' IDENTIFIED BY 'cmwin@110!' WITH GRANT OPTION;
 

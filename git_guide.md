@@ -193,6 +193,19 @@ get fetch
 git checkout -b local_name origin/bname
 ```
 
+## 项目推送远程
+
+```
+1. 登录gitee账号，新建一个仓库（强烈建议远程仓库和本地仓库同名）,创建完成后会生成了远程仓库地址
+
+2.进入本地项目的文件目录，使用如下命令
+1. git init   将本地项目初始化为一个本地仓库
+2. git add .   将本地项目的所有文件和文件夹添加到本地仓库的暂存区
+3. git commit -m '初始化'    提交本地所有文件到暂存区
+4. git remote add origin https://gitee.com/xxxx/xxxx.git   添加远程仓库关联
+5. git push -u origin master   推送代码到远程仓库的master分支
+```
+
 
 
 * git log --graph --pretty=oneline --abbrev-commit

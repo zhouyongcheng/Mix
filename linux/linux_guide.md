@@ -154,11 +154,25 @@ HOSTNAME=node21
 hostnamectl --static set-hostname name
 ```
 
-## 3. ssh免密登陆
-```
-1. ssh-keygen -t rsa
-2. ssh-copy-id -i ~/.ssh/id_rsa.pub username@nodename
-ssh-copy-id -i ~/.ssh/id_rsa.pub cmwin@node03
+### 配置免密登录
+
+```shell
+# 在每台机器上执行下面命令(node41,node42,node43)
+ssh-keygen -t rsa
+
+# copy每台机器的id到node41上面
+# node41, node42， node43上分别执行, 执行完成后，node41的authorizied_key中会记录各节点的public_key
+ssh-copy-id node41
+
+# 把node41上的~/.ssh/authorized_keys文件copy到node42,node43
+cd ~/.ssh
+scp ~/.ssh/authorized_keys node42:`pwd`
+scp ~/.ssh/authorized_keys node43:`pwd`
+
+# 在各节点上都执行,host_name里会添加各host的记录，完成各个节点间免密登录
+ssh node41
+ssh node42
+ssh node43
 ```
 
 ## 4. 软连接的创建

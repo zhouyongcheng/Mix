@@ -13,7 +13,7 @@ https://developer.aliyun.com/article/753999
 
 
 
-# 注意事项
+## 注意事项
 
 ```
 1. flink内部封装了状态数据，而且状态数据并不会被清理，因此一定要避免在一个无限数据流上使用aggregation。
@@ -42,7 +42,38 @@ bin/jobmanager.sh stop | start
 ```shell
 mvn clean package -Dmaven.test.skip=true
 flink run -c demo.SocketTextStreamWordCount /home/demo/word-count-1.0-SNAPSHOT.jar 127.0.0.1 9000
-nc -l 9999
+nc -lk 9999
+```
+
+www.itellyou.cn
+
+## flink cdc相关
+
+### flink启动sql控制台
+
+```shell
+./bin/sql-client.sh embedded
+> set execution.result-mode=tableau;
+>set sql-client.execution.result-mode=table;
+
+```
+
+### 创建flink的关联表
+
+```sql
+CREATE TABLE test_flink_cdc ( 
+  id INT, 
+  name STRING,
+  primary key(id)  NOT ENFORCED
+) WITH ( 
+  'connector' = 'mysql-cdc', 
+  'hostname' = 'localhost', 
+  'port' = '3306', 
+  'username' = 'root', 
+  'password' = '123456', 
+  'database-name' = 'mcsell', 
+  'table-name' = 'demo' 
+);
 ```
 
 
@@ -708,3 +739,67 @@ SELECT name,
   GROUP BY name;
 ```
 
+### flink connector使用
+
+1. 开启checkpoint, 每3秒执行一次
+
+```shell
+Flink SQL> SET execution.checkpointing.interval = 3s;
+```
+
+2. 创建数据库表
+
+   ```sql
+   CREATE TABLE demo (    
+       id INT,
+       name STRING,
+       PRIMARY KEY (id) NOT ENFORCED  
+   ) WITH (
+       'connector' = 'mysql-cdc',
+       'hostname' = 'localhost',
+       'port' = '3306',
+       'username' = 'root',
+       'password' = '123456',
+       'database-name' = 'mcsell',
+       'table-name' = 'demo'  
+   );
+   
+   将来
+   
+   CREATE TABLE products (    
+       id INT,
+       name STRING,
+       description STRING,
+       PRIMARY KEY (id) NOT ENFORCED  
+   ) WITH (
+       'connector' = 'mysql-cdc',
+       'hostname' = 'localhost',
+       'port' = '3306',
+       'username' = 'root',
+       'password' = '123456',
+       'database-name' = 'mydb',
+       'table-name' = 'products'  
+   );
+   CREATE TABLE orders (   
+       order_id INT,   
+       order_date TIMESTAMP(0),
+       customer_name STRING,
+       price DECIMAL(10, 5),
+       product_id INT,
+       order_status BOOLEAN,
+       PRIMARY KEY (order_id) NOT ENFORCED 
+   ) WITH (   
+       'connector' = 'mysql-cdc',
+       'hostname' = 'localhost',
+       'port' = '3306',
+       'username' = 'root',
+       'password' = '123456',
+       'database-name' = 'mydb',
+       'table-name' = 'orders' );
+      
+   CREATE TABLE shipments (   shipment_id INT,   order_id INT,   origin STRING,   destination STRING,   is_arrived BOOLEAN,   PRIMARY KEY (shipment_id) NOT ENFORCED ) WITH (   'connector' = 'postgres-cdc',   'hostname' = 'localhost',   'port' = '5432',   'username' = 'postgres',   'password' = 'postgres',   'database-name' = 'postgres',   'schema-name' = 'public',   'table-name' = 'shipments' );
+   ```
+
+   
+
+3. xx

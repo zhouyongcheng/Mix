@@ -17,8 +17,57 @@ ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/var/lib
 4)$MYSQL_HOME/my.cnf
 --------------------------------
 
+## 下载软件包
+
+```properties
+# 删除系统自带的mysql
+rpm -qa | grep -i mari
+rpm -e --nodeps mari*
+
+# 下载软件包
+wget http://dev.mysql.com/get/mysql-5.7.26-1.el7.x86_64.rpm-bundle.tar
+tar -xvf mysql-5.xxx.tar
+
+# 执行下面的安装
+rpm -ivh mysql-community-common....
+rpm -ivh mysql-community-libs..
+rpm -ivh mysql-community-libs-compat..
+rpm -ivh mysql-community-client...
+rpm -ivh mysql-community-server..
+
+# 启动mysql
+systemctl start mysqld.service
+
+# 获取初始秘码,用初始秘密登录到mysql
+grep 'password' /var/log/mysqld.log
+A temporary password is generated for root@localhost: F.tjjDjP;2;5
+mysql -uroot -p
+
+# 
+set global validate_password_policy=0;
+
+# 修改用户密码方式1
+alter user user() identified by "cmwin110!";
+
+# 修改用户秘密方式2
+set password for 'root'@'localhost'=password('cmwin110!');
+
+# 授权用户访问权限
+grant all privileges on *.* to 'root'@'%' identified by 'cmwin110!' with grant option;
+flush privileges;
+
+# 设置开机启动
+systemctl enable mysqld
+
+# 查看是否已经设置成功
+systemctl list-unit-files | grep mysqld
+```
+
+
+
 配置文件信息
 ----------------------------------------
+
 ````properties
 # /etc/my.cnf
 

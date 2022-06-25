@@ -100,3 +100,25 @@ privileged: true
 
 ```
 
+
+### dolphinscheduler启动关闭
+```bash
+#下载datax的编译好的文件，也可以自己本地编译
+docker cp datax.tgz docker-swarm_dolphinscheduler-worker_1:/opt/soft
+docker cp /data/soft/
+
+docker exec -it docker-swarm_dolphinscheduler-worker_1 bash
+  
+cd /opt/soft
+tar zxf datax.tgz
+rm -f datax.tgz
+mv datax.tgz datax
+
+cd /data/soft/dolphinscheduler/docker/docker-swarm
+docker-compose up -d
+docker-compose -f docker-compose.yml stop
+
+# 停止所有容器并移除所有容器、网络和存储卷
+docker-compose down -v
+
+```
