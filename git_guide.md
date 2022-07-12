@@ -181,6 +181,10 @@ git merge <name>
 git branch -d <name>
 # 强行删除分支： 
 git branch -D feature-vulcan  （丢弃一个没有被合并过的分支）
+# 查看合并完成的分支
+git branch --merged
+# 查看未合并过的分支
+git branch --no-merged
 # 创建本地dev分支和远程dev分支绑定 
 git checkout -b dev origin/dev
 # 建立本地分支和远程分支的关联，远程已经存在dev分支的情况下。 
