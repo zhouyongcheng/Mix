@@ -13,7 +13,7 @@
         </exclusion>
     </exclusions>
 </dependency>
-<dependency>
+<dependency>            
     <groupId>redis.clients</groupId>
     <artifactId>jedis</artifactId>
 </dependency>

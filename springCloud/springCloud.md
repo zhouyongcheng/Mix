@@ -1,3 +1,10 @@
+[toc]
+# 软件下载
+   - ftp软件下载
+   - wget软件下载
+   
+# 软件安装
+# 性能调优
 
 
 # oauth endpoint
@@ -11,8 +18,6 @@
 /oauth/token_key (如果使用JWT，可以获的公钥用于 token 的验签)
 ```
 
-
-
 curl -s cmwin:manager@192.168.3.5:4001/oauth/token  \
  -d grant_type=client_credentials \
  -d scope=app
@@ -20,11 +25,18 @@ curl -s cmwin:manager@192.168.3.5:4001/oauth/token  \
  curl -s clientId:secretId@192.168.3.5:4001oauth/token  \
  -d grant_type=client_credentials \
  -d scope=app
-
-
-
 ```
 com.github
 thymeleaf-extras-shiro
 ```
 
+## 加载外部jar
+```xml
+<dependency>
+    <groupId>com.alibaba.datax</groupId>
+    <artifactId>mysqlreader</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/src/main/resources/lib/mysqlreader-0.0.1-SNAPSHOT.jar</systemPath>
+</dependency>
+```
